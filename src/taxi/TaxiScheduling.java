@@ -5,7 +5,6 @@
  */
 package taxi;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -19,7 +18,7 @@ public class TaxiScheduling {
     int n;
     Taxi[] taxis;
     TaxiScanner scanner = TaxiScanner.getInstance();
-    boolean[][] adMat; //Adjacency matrix
+    boolean[][] adMat;
     Queue<Customer> orderQueue = new LinkedList<Customer>();
     
     public void initialize() { //Get the first lines of code that give the parameters and the graph structure.
@@ -28,10 +27,9 @@ public class TaxiScheduling {
         m = Integer.parseInt(scanner.nextLine());
         String[] parts = scanner.nextLine().split(" ");
         x = Integer.parseInt(parts[0]);
-        taxis = new Taxi[x]; //Initialize the taxi's
+        taxis = new Taxi[x]; //Initialize the taxis
         for(int i=0; i<x; i++){
-            Taxi taxi = new Taxi(c);
-            taxi.ID = i;
+            Taxi taxi = new Taxi();
             taxis[i] = taxi;
         }
         c = Integer.parseInt(parts[1]);
@@ -140,7 +138,6 @@ public class TaxiScheduling {
     
     public boolean directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
         //System.out.println(t.path);
-        //System.out.println(t.getLoc());
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             //System.out.println("A");
             t.dropPas();
@@ -160,14 +157,8 @@ public class TaxiScheduling {
             t.setLoc(t.getPath());
         }
         return false;
-    }
-    
-    public void setInitialPos(){
-        for(Taxi taxi:taxis){
-            taxi.setLoc((int) (Math.random()*n));
-            //System.out.println("Taxi "+taxi.getNum()+" to pos: "+taxi.getLoc());
-        }
-        scanner.println("c");
+        
+        
     }
     
     public void run(){
@@ -179,34 +170,22 @@ public class TaxiScheduling {
         //System.out.println(Arrays.toString(inefficientShortestPath(2,6)));
         
         //Initialize position...
-        //taxis[0].setLoc(0);
-        //scanner.println("c");
-        setInitialPos();
-        
+        taxis[0].setLoc(0);
+        scanner.println("c");
         while(!done){
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
-            
-            for (int i=0; i<taxis.length; i++){
-                
-                if(taxis[i].isEmpty()) {
-                    taxis[i].clients.add(orderQueue.poll());
-                } 
-                directWalk(taxis[i], taxis[i].clients.get(0));
-                
-                //System.out.println(taxis[0].getNum()+taxis[0].clients.get(0).getLoc());
+            //System.out.println("Queue size: "+orderQueue.size());
+            boolean status = directWalk(taxis[0], orderQueue.peek());
+            if(status){
+                orderQueue.remove();
             }
-            
-            
             scanner.println("c");
-            boolean empty = true;
-            for(int i=0; i<taxis.length; i++) {
-                empty &= taxis[i].isEmpty();
-            }
-            if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty){
+            if(!scanner.hasNextLine() && orderQueue.isEmpty()){
                 done=true;
             }
+            
         }
     }
     /**
