@@ -5,7 +5,6 @@
  */
 package taxi;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -138,7 +137,7 @@ public class TaxiScheduling {
     }
     
     public boolean directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
-        System.out.println(t.path);
+        //System.out.println(t.path);
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             //System.out.println("A");
             t.dropPas();
