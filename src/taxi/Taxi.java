@@ -5,16 +5,10 @@
  */
 package taxi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-
-
+import java.util.*;
 
 public class Taxi {
+    // I made a comment
     TaxiScanner scanner = TaxiScanner.getInstance();
     int ID;
     int location;
@@ -22,8 +16,7 @@ public class Taxi {
     List<Customer> clients = new ArrayList<Customer>();
     Queue<Integer> path = new LinkedList<Integer>();
 
-    public Taxi(int cap) {
-        capacity = cap;
+    public Taxi() {
     }
     
     public int getNum(){
@@ -40,9 +33,6 @@ public class Taxi {
 //    }
     public int getPath(){
         return path.poll();
-    }
-    public boolean isEmpty() {
-        return clients.isEmpty();
     }
     public void setPath(Integer[] p){
         path.addAll(Arrays.asList(p) );

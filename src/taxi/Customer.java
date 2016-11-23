@@ -16,6 +16,8 @@ public class Customer {
     int location;
     int destination;
     int startTime;
+
+
     
     public Status getStatus(){
         return status;

@@ -32,7 +32,7 @@ public class TaxiScanner {
      */
     private TaxiScanner(){
         state = State.INITIAL;
-        File input = new File("C:/Users/s151341/Documents/NetBeansProjects/Taxi/src/taxi/input.txt");
+        File input = new File("input.txt");//Put the path to the file here
         try {
             scanner = new Scanner(input);
         } catch (FileNotFoundException e) {
