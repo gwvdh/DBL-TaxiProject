@@ -8,7 +8,6 @@ package taxi;
 import java.util.LinkedList;
 import java.util.Queue;
 
-
 public class TaxiScheduling {
     int l;
     double alpha;
