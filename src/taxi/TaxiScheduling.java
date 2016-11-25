@@ -172,6 +172,7 @@ public class TaxiScheduling {
     
     public void run(){
         boolean done=false;
+        int counter=0;
         //System.out.println("hi");
         initialize();
         //System.out.printf("Initial: %d, %f, %d, %d, %d\n", l, alpha, m, x, c);
@@ -201,8 +202,9 @@ public class TaxiScheduling {
                 //System.out.println(taxis[0].getNum()+taxis[0].clients.get(0).getLoc());
             }
             
-            
+            counter++;
             scanner.println("c");
+            System.out.println(counter);
             boolean empty = true;
             for(int i=0; i<taxis.length; i++) {
                 empty &= taxis[i].isEmpty();
