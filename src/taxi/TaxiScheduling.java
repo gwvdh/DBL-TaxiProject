@@ -1,10 +1,11 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * rtryuiojhkand open the template in the editor.
+ * and open the template in the editor.
  */
 package taxi;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -15,26 +16,27 @@ public class TaxiScheduling {
     int x;
     int c;
     int n;
-
+    
     int time;
     double totalCost;
-
+    
     Taxi[] taxis;
     TaxiScanner scanner = TaxiScanner.getInstance();
-    boolean[][] adMat;
+    boolean[][] adMat; //Adjacency matrix
     Queue<Customer> orderQueue = new LinkedList<Customer>();
     
     public void initialize() { //Get the first lines of code that give the parameters and the graph structure.
         time = 0;
-        totalCost = 0;
+        totalCost=0;
         l = Integer.parseInt(scanner.nextLine());
         alpha = Double.parseDouble(scanner.nextLine());
         m = Integer.parseInt(scanner.nextLine());
         String[] parts = scanner.nextLine().split(" ");
         x = Integer.parseInt(parts[0]);
-        taxis = new Taxi[x]; //Initialize the taxis
+        taxis = new Taxi[x]; //Initialize the taxi's
         for(int i=0; i<x; i++){
-            Taxi taxi = new Taxi();
+            Taxi taxi = new Taxi(c);
+            taxi.ID = i;
             taxis[i] = taxi;
         }
         c = Integer.parseInt(parts[1]);
@@ -134,15 +136,19 @@ public class TaxiScheduling {
     public void getOrders(String s) { //Get the client information from input.
         int p = Integer.parseInt(s.split(" ")[0]); //Get the first element indicating the amount of orders
         for(int i=0; i<p;i++){
-            int loc = Integer.parseInt(s.split(" ")[i*2+1]); //Set the first element of the customer as the location (by def)
-            int dest = Integer.parseInt(s.split(" ")[i*2+2]); //Set the second element of the customer as the destination (by def)
-            Customer c = new Customer(loc, dest, time, alpha); //Make new customer
+            int loc = Integer.parseInt(s.split(" ")[i*2+1]);
+            int dest = Integer.parseInt(s.split(" ")[i*2+2]);
+            Customer c = new Customer(loc,dest,time,alpha);
+//            Customer c = new Customer(); //Make new customer
+//            c.setLoc(Integer.parseInt(s.split(" ")[i*2+1])); //Set the first element of the customer as the location (by def)
+//            c.setDest(Integer.parseInt(s.split(" ")[i*2+2])); //Set the second element of the customer as the destination (by def)
             orderQueue.add(c); //Add the customer to the queue
         }
     }
     
     public boolean directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
         //System.out.println(t.path);
+        //System.out.println(t.getLoc());
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             //System.out.println("A");
             totalCost += c.arrived(time);
@@ -167,8 +173,17 @@ public class TaxiScheduling {
         return false;
     }
     
+    public void setInitialPos(){
+        for(Taxi taxi:taxis){
+            taxi.setLoc((int) (Math.random()*n));
+            //System.out.println("Taxi "+taxi.getNum()+" to pos: "+taxi.getLoc());
+        }
+        scanner.println("c");
+    }
+    
     public void run(){
         boolean done=false;
+        //int counter=0;
         //System.out.println("hi");
         initialize();
         //System.out.printf("Initial: %d, %f, %d, %d, %d\n", l, alpha, m, x, c);
@@ -176,23 +191,39 @@ public class TaxiScheduling {
         //System.out.println(Arrays.toString(inefficientShortestPath(2,6)));
         
         //Initialize position...
-        taxis[0].setLoc(0);
-        scanner.println("c");
+        //taxis[0].setLoc(0);
+        //scanner.println("c");
+        setInitialPos();
+        
         while(!done){
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
-            //System.out.println("Queue size: "+orderQueue.size());
-            boolean status = directWalk(taxis[0], orderQueue.peek());
-            if(status){
-                orderQueue.remove();
-            }
-            scanner.println("c");
-            time++;
-            if(!scanner.hasNextLine() && orderQueue.isEmpty()){
-                done=true;
+            
+            for (int i=0; i<taxis.length; i++){
+                
+                if(taxis[i].isEmpty() && !orderQueue.isEmpty()) {
+                    taxis[i].clients.add(orderQueue.poll());
+                    directWalk(taxis[i], taxis[i].clients.get(0));
+                } else if(!taxis[i].isEmpty()) {
+                    directWalk(taxis[i], taxis[i].clients.get(0));
+                } 
+                
+                
+                //System.out.println(taxis[0].getNum()+taxis[0].clients.get(0).getLoc());
             }
             
+            //counter++;
+            scanner.println("c");
+            time++;
+            System.out.println(time);
+            boolean empty = true;
+            for(int i=0; i<taxis.length; i++) {
+                empty &= taxis[i].isEmpty();
+            }
+            if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty){
+                done=true;
+            }
         }
     }
     /**
