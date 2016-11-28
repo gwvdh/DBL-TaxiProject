@@ -5,10 +5,17 @@
  */
 package taxi;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import taxi.Customer.Status;
+
+
+
 
 public class Taxi {
-    // I made a comment
     TaxiScanner scanner = TaxiScanner.getInstance();
     int ID;
     int location;
@@ -16,7 +23,8 @@ public class Taxi {
     List<Customer> clients = new ArrayList<Customer>();
     Queue<Integer> path = new LinkedList<Integer>();
 
-    public Taxi() {
+    public Taxi(int cap) {
+        capacity = cap;
     }
     
     public int getNum(){
@@ -34,6 +42,9 @@ public class Taxi {
     public int getPath(){
         return path.poll();
     }
+    public boolean isEmpty() {
+        return clients.isEmpty();
+    }
     public void setPath(Integer[] p){
         path.addAll(Arrays.asList(p) );
     }
@@ -41,10 +52,13 @@ public class Taxi {
         capacity = c;
     }
     public boolean isIn(Customer c){
-        return clients.contains(c);
+        if(clients.contains(c) && c.status == Status.TRANSIT){
+            return true;
+        }
+        return false;
     }
     public void addPas(Customer customer) {
-        clients.add(customer);
+        //clients.add(customer);
         customer.setStatus(Customer.Status.TRANSIT);
         scanner.println("p "+ this.ID+" "+ this.location+" ");
     }
@@ -64,7 +78,10 @@ public class Taxi {
         for(int i=0; i<clients.size(); i++){
             if(clients.get(i).getDest() == this.location){
                 scanner.println("d "+ this.ID+" "+ this.location+" ");
-                clients.remove(i); // needs to be rethought
+                clients.get(i).setStatus(Customer.Status.ARRIVED);
+                //System.out.println("before: "+clients);
+                clients.remove(i);
+                //System.out.println("after: "+clients);
             }
         }
     }
