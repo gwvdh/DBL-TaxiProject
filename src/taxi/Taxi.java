@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package src.taxi;
+package taxi;
 
 import java.util.*;
 
@@ -64,8 +64,7 @@ public class Taxi {
         for(int i=0; i<clients.size(); i++){
             if(clients.get(i).getDest() == this.location){
                 scanner.println("d "+ this.ID+" "+ this.location+" ");
-                clients.get(i).setStatus(Customer.Status.ARRIVED);
-                clients.remove(i);
+                clients.remove(i); // needs to be rethought
             }
         }
     }

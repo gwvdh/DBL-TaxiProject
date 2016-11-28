@@ -3,21 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package src.taxi;
+package taxi;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class TaxiScheduling {
     int l;
-    public static double alpha;
+    double alpha;
     int m;
     int x;
     int c;
     int n;
 
-    public int time;
-    public static double totalCost;
+    int time;
+    double totalCost;
 
     Taxi[] taxis;
     TaxiScanner scanner = TaxiScanner.getInstance();
@@ -136,7 +136,7 @@ public class TaxiScheduling {
         for(int i=0; i<p;i++){
             int loc = Integer.parseInt(s.split(" ")[i*2+1]); //Set the first element of the customer as the location (by def)
             int dest = Integer.parseInt(s.split(" ")[i*2+2]); //Set the second element of the customer as the destination (by def)
-            Customer c = new Customer(loc, dest, time); //Make new customer
+            Customer c = new Customer(loc, dest, time, alpha); //Make new customer
             orderQueue.add(c); //Add the customer to the queue
         }
     }
@@ -145,6 +145,7 @@ public class TaxiScheduling {
         //System.out.println(t.path);
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             //System.out.println("A");
+            totalCost += c.arrived(time);
             t.dropPas();
             return true;
         } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
@@ -164,17 +165,6 @@ public class TaxiScheduling {
             t.setLoc(t.getPath());
         }
         return false;
-    }
-
-    public static double cost(int a, int c, int shortest){
-        double aa = (double)(a);
-        double cc = (double)(c);
-        double ss = (double)(shortest);
-        return Math.pow((aa-cc)/Math.pow(ss + 2, alpha), 2.0);
-    }
-
-    public static void addCost(double currentCost){
-        totalCost += currentCost;
     }
     
     public void run(){

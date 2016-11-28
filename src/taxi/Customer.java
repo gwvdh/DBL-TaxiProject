@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package src.taxi;
+package taxi;
 
 
 
@@ -18,15 +18,24 @@ public class Customer {
 
     int startTime;
     int shortest;
-    int endTime;
+
+    double alpha;
 
     Status status;
 
-    Customer(int location, int destination, int startTime){
+    Customer(int location, int destination, int startTime, double alpha){
         this.location = location;
         this.destination = destination;
         this.startTime = startTime;
+        this.alpha = alpha;
         status = Status.WAITING;
+    }
+
+    public double cost(int a, int c, int shortest){
+        double aa = (double)(a);
+        double cc = (double)(c);
+        double ss = (double)(shortest);
+        return Math.pow((aa-cc)/Math.pow(ss + 2, alpha), 2.0);
     }
     
     public Status getStatus(){
@@ -47,9 +56,9 @@ public class Customer {
     public void setStatus(Status s){
         status = s;
     }
-    public void arrived(int time){
+    public double arrived(int time){
         status = Status.ARRIVED;
-        TaxiScheduling.addCost(TaxiScheduling.cost(time, startTime, shortest));
+        return cost(time, startTime, shortest);
     }
     public void setDest(int d){
         this.destination = d;
