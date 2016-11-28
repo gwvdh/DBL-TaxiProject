@@ -6,3 +6,4 @@ out/production/DBL-TaxiProject/manifest.mf
 *.properties
 out/production/DBL-TaxiProject/README.md
 *.class
+/nbproject/private/
