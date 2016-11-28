@@ -11,13 +11,32 @@ public class Customer {
     public enum Status {
         WAITING, TRANSIT, ARRIVED
     }
-    Status status = Status.WAITING;
-    int ID;
+    // do we even use ID?
+    //int ID;
     int location;
     int destination;
+
     int startTime;
+    int shortest;
 
+    double alpha;
 
+    Status status;
+
+    Customer(int location, int destination, int startTime, double alpha){
+        this.location = location;
+        this.destination = destination;
+        this.startTime = startTime;
+        this.alpha = alpha;
+        status = Status.WAITING;
+    }
+
+    public double cost(int a, int c, int shortest){
+        double aa = (double)(a);
+        double cc = (double)(c);
+        double ss = (double)(shortest);
+        return Math.pow((aa-cc)/Math.pow(ss + 2, alpha), 2.0);
+    }
     
     public Status getStatus(){
         return status;
@@ -28,11 +47,18 @@ public class Customer {
     public int getDest(){
         return this.destination;
     }
+    public void setShortest(int shortest){
+        this.shortest = shortest;
+    }
     public void setLoc(int l){
         this.location = l;
     }
     public void setStatus(Status s){
         status = s;
+    }
+    public double arrived(int time){
+        status = Status.ARRIVED;
+        return cost(time, startTime, shortest);
     }
     public void setDest(int d){
         this.destination = d;

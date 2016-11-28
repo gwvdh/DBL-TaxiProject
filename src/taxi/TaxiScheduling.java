@@ -8,7 +8,6 @@ package taxi;
 import java.util.LinkedList;
 import java.util.Queue;
 
-
 public class TaxiScheduling {
     int l;
     double alpha;
@@ -16,12 +15,18 @@ public class TaxiScheduling {
     int x;
     int c;
     int n;
+
+    int time;
+    double totalCost;
+
     Taxi[] taxis;
     TaxiScanner scanner = TaxiScanner.getInstance();
     boolean[][] adMat;
     Queue<Customer> orderQueue = new LinkedList<Customer>();
     
     public void initialize() { //Get the first lines of code that give the parameters and the graph structure.
+        time = 0;
+        totalCost = 0;
         l = Integer.parseInt(scanner.nextLine());
         alpha = Double.parseDouble(scanner.nextLine());
         m = Integer.parseInt(scanner.nextLine());
@@ -129,9 +134,9 @@ public class TaxiScheduling {
     public void getOrders(String s) { //Get the client information from input.
         int p = Integer.parseInt(s.split(" ")[0]); //Get the first element indicating the amount of orders
         for(int i=0; i<p;i++){
-            Customer c = new Customer(); //Make new customer
-            c.setLoc(Integer.parseInt(s.split(" ")[i*2+1])); //Set the first element of the customer as the location (by def)
-            c.setDest(Integer.parseInt(s.split(" ")[i*2+2])); //Set the second element of the customer as the destination (by def)
+            int loc = Integer.parseInt(s.split(" ")[i*2+1]); //Set the first element of the customer as the location (by def)
+            int dest = Integer.parseInt(s.split(" ")[i*2+2]); //Set the second element of the customer as the destination (by def)
+            Customer c = new Customer(loc, dest, time, alpha); //Make new customer
             orderQueue.add(c); //Add the customer to the queue
         }
     }
@@ -140,6 +145,7 @@ public class TaxiScheduling {
         //System.out.println(t.path);
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             //System.out.println("A");
+            totalCost += c.arrived(time);
             t.dropPas();
             return true;
         } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
@@ -151,14 +157,14 @@ public class TaxiScheduling {
         } else if(t.getLoc() == c.getLoc() && !t.isIn(c)){
             //System.out.println("C");
             t.addPas(c);
-            t.setPath(inefficientShortestPath(t.getLoc(), c.getDest()));
+            Integer[] path = inefficientShortestPath(t.getLoc(), c.getDest());
+            t.setPath(path);
+            c.setShortest(path.length);
         } else if(t.getLoc() != c.getDest() && t.isIn(c)){
             //System.out.println("D");
             t.setLoc(t.getPath());
         }
         return false;
-        
-        
     }
     
     public void run(){
@@ -182,6 +188,7 @@ public class TaxiScheduling {
                 orderQueue.remove();
             }
             scanner.println("c");
+            time++;
             if(!scanner.hasNextLine() && orderQueue.isEmpty()){
                 done=true;
             }
