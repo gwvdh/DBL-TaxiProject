@@ -7,3 +7,4 @@ out/production/DBL-TaxiProject/manifest.mf
 out/production/DBL-TaxiProject/README.md
 *.class
 /nbproject/private/
+/build/

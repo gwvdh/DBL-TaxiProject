@@ -20,9 +20,10 @@ public class TaxiScheduling {
     int time;
     double totalCost;
     
+    Node[] nodes;
     Taxi[] taxis;
     TaxiScanner scanner = TaxiScanner.getInstance();
-    boolean[][] adMat; //Adjacency matrix
+    //boolean[][] adMat; //Adjacency matrix
     Queue<Customer> orderQueue = new LinkedList<Customer>();
     
     public void initialize() { //Get the first lines of code that give the parameters and the graph structure.
@@ -44,13 +45,18 @@ public class TaxiScheduling {
 //            taxis[i].setCap(c);
 //        }
         n = Integer.parseInt(scanner.nextLine());
-        adMat = new boolean[n][n];
+        nodes = new Node[n];
         for(int i=0;i<n;i++){
             String[] adjacent = scanner.nextLine().split(" ");
-            for(int j=1; j<=Integer.parseInt(adjacent[0]); j++) {
+            int p = Integer.parseInt(adjacent[0]);
+            boolean[] adj = new boolean[n];//Boolean array, because it has increased performance since we will not manipulate the array, just find items
+            for(int j=1; j<=p; j++) {
                 //System.out.println(Integer.parseInt(adjacent[j]));
-                adMat[i][Integer.parseInt(adjacent[j])] = true;
+                adj[Integer.parseInt(adjacent[j])] = true;
+                //adMat[i][Integer.parseInt(adjacent[j])] = true;
             }
+            Node node = new Node(i,adj);
+            nodes[i] = node;
         }
         scanner.nextLine();//THIS REMOVES T AND T' !!!!!!!!! TEMP SOLUTION>>>
     }
@@ -62,7 +68,7 @@ public class TaxiScheduling {
             System.out.printf("\n");
         for(int i=0; i<n; i++) {
             for(int j=0; j<n; j++) {
-                if(adMat[i][j]) {
+                if(nodes[i].isAdj(j)) {
                     System.out.printf("|x");
                 } else {
                     System.out.printf("| ");
@@ -91,7 +97,7 @@ public class TaxiScheduling {
             //System.out.println(current);
             visited[current] = true;
             for(int j=0; j<n; j++) {
-                if(adMat[current][j] && !visited[j] && distance[current]<distance[j]) {//If the node is adjacent, not visited and the shortest distance:
+                if(nodes[current].isAdj(j) && !visited[j] && distance[current]<distance[j]) {//If the node is adjacent, not visited and the shortest distance:
                     distance[j]=distance[current]+1;//Set the node distance as previous shortest distance+1 (Distance current node to previous node)
                     //System.out.println(Arrays.toString(distance));
                 }
@@ -122,7 +128,7 @@ public class TaxiScheduling {
             int smallest = 2*n;
             int index = -1;
             for(int j=0; j<n; j++) {
-                if(distance[j]<smallest && adMat[current][j]) {
+                if(distance[j]<smallest && nodes[current].isAdj(j)) {
                     smallest = distance[j];
                     index = j;
                 }
