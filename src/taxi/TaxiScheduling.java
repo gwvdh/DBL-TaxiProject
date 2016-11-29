@@ -26,7 +26,7 @@ public class TaxiScheduling {
     //boolean[][] adMat; //Adjacency matrix
     Queue<Customer> orderQueue = new LinkedList<Customer>();
     
-    public void initialize() { //Get the first lines of code that give the parameters and the graph structure.
+    TaxiScheduling() { //Get the first lines of code that give the parameters and the graph structure.
         time = 0;
         totalCost=0;
         l = Integer.parseInt(scanner.nextLine());
@@ -191,7 +191,7 @@ public class TaxiScheduling {
         boolean done=false;
         //int counter=0;
         //System.out.println("hi");
-        initialize();
+        //initialize(); replaced initialize with constructor
         //System.out.printf("Initial: %d, %f, %d, %d, %d\n", l, alpha, m, x, c);
         printAdMat();
         //System.out.println(Arrays.toString(inefficientShortestPath(2,6)));
