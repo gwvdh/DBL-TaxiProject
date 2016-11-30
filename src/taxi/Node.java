@@ -12,6 +12,7 @@ package taxi;
 public class Node {
     int id;
     boolean[] adjacent;
+    Integer[] distance;
     
     Node(int id, boolean[] adj){
         this.id = id;
@@ -20,5 +21,11 @@ public class Node {
     
     public boolean isAdj(int node){
         return adjacent[node];
+    }
+    public void setDistance(Integer[] d){
+        this.distance = d;
+    }
+    public Integer[] getDistance(){
+        return distance;
     }
 }
