@@ -20,6 +20,8 @@ public class Customer {
     double alpha;
     Status status;
     
+    Taxi targetTaxi;//Assign customer to taxi
+    
     Customer(int location, int destination, int startTime, double alpha){
         this.location = location;
         this.destination = destination;
@@ -60,5 +62,10 @@ public class Customer {
     public void setDest(int d){
         this.destination = d;
     }
-    
+    public void setTargetTaxi(Taxi taxi){//Assign customer to taxi
+        this.targetTaxi = taxi;
+    }
+    public Taxi getTargetTaxi(){
+        return targetTaxi;
+    }
 }

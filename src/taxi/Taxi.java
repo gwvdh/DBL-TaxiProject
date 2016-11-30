@@ -20,8 +20,9 @@ public class Taxi {
     int ID;
     int location;
     int capacity; //How many spots are available
-    List<Customer> clients = new ArrayList<Customer>();
-    Queue<Integer> path = new LinkedList<Integer>();
+    int destination;
+    List<Customer> clients = new ArrayList<>();
+    Queue<Integer> path = new LinkedList<>();
 
     public Taxi(int cap) {
         capacity = cap;
@@ -36,9 +37,17 @@ public class Taxi {
     public int getCap(){
         return this.capacity;
     }
-//    public int[] getPath(){
-//        return this.path;
-//    }
+    public int getDest(){
+        return destination;
+    }
+    public boolean wantsDrop(){
+        for(Customer client: clients){
+            if(client.getDest()==this.getLoc()){
+                return true;
+            }
+        }
+        return false;
+    }
     public int getPath(){
         return path.poll();
     }
@@ -46,6 +55,9 @@ public class Taxi {
         return clients.isEmpty();
     }
     public void setPath(Integer[] p){
+        if(path.isEmpty()){
+            destination = p[p.length-1];
+        }
         path.addAll(Arrays.asList(p) );
     }
     public void setCap(int c){
