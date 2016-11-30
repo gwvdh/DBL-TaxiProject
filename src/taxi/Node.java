@@ -5,6 +5,8 @@
  */
 package taxi;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author s151341
@@ -12,7 +14,10 @@ package taxi;
 public class Node {
     int id;
     boolean[] adjacent;
-    
+    int distance;
+    Node parent;
+    ArrayList<Taxi> taxiList = new ArrayList<>();
+
     Node(int id, boolean[] adj){
         this.id = id;
         this.adjacent = adj;
@@ -20,5 +25,33 @@ public class Node {
     
     public boolean isAdj(int node){
         return adjacent[node];
+    }
+
+    public void setDistance(int d) {
+        distance = d;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setParent(Node node) {
+        parent = node;
+    }
+
+    public Node getParent(){
+        return parent;
+    }
+
+    public void addTaxi(Taxi taxi){
+        taxiList.add(taxi);
+    }
+
+    public ArrayList<Taxi> getTaxis(){
+        return taxiList;
+    }
+
+    public boolean hasTaxi(){
+        return !taxiList.isEmpty();
     }
 }

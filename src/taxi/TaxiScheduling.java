@@ -138,6 +138,33 @@ public class TaxiScheduling {
         //System.out.println(Arrays.toString(distance));
         return path;
     }
+
+    // from wikipedia BFS non-recursive implementation
+    private Node BreadthFirstSearch(Node root) {
+        for(Node node : nodes) {
+            node.setParent(null);
+            node.setDistance(-1);
+        }
+
+        Queue<Node> Q = new LinkedList<>();
+
+        root.setDistance(0);
+        Q.add(root);
+
+        while(!Q.isEmpty()){
+            Node current = Q.poll();
+            for(int i = 0; i < current.adjacent.length; i++) {
+                if(current.isAdj(i) && current.getDistance() == -1){
+                    nodes[i].setDistance(current.getDistance()+1);
+                    nodes[i].setParent(current);
+                    Q.add(nodes[i]);
+                    if(nodes[i].hasTaxi())
+                        return nodes[i];
+                }
+            }
+        }
+        return null;
+    }
     
     private void getOrders(String s) { //Get the client information from input.
         int p = Integer.parseInt(s.split(" ")[0]); //Get the first element indicating the amount of orders
@@ -222,6 +249,7 @@ public class TaxiScheduling {
             scanner.println("c");
             time++;
             System.out.println(time);
+            System.out.println(totalCost);
             boolean empty = true;
             for (Taxi taxi : taxis) {
                 empty &= taxi.isEmpty();
