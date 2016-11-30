@@ -26,7 +26,7 @@ public class TaxiScheduling {
     //boolean[][] adMat; //Adjacency matrix
     Queue<Customer> orderQueue = new LinkedList<Customer>();
     
-    TaxiScheduling() { //Get the first lines of code that give the parameters and the graph structure.
+    private TaxiScheduling() { //Get the first lines of code that give the parameters and the graph structure.
         time = 0;
         totalCost=0;
         l = Integer.parseInt(scanner.nextLine());
@@ -61,7 +61,7 @@ public class TaxiScheduling {
         scanner.nextLine();//THIS REMOVES T AND T' !!!!!!!!! TEMP SOLUTION>>>
     }
     
-    public void printAdMat() { //Method for printing an adjacency matrix.
+    private void printAdMat() { //Method for printing an adjacency matrix.
         for(int j=0; j<=n*2; j++) {
                 System.out.printf("-");
             }
@@ -82,7 +82,7 @@ public class TaxiScheduling {
         System.out.printf("\n");
     }
     
-    public Integer[] inefficientShortestPath(int start, int goal) { //Shortest path according to Dijkstra
+    private Integer[] inefficientShortestPath(int start, int goal) { //Shortest path according to Dijkstra
         Integer[] distance  = new Integer[n];//n amount of nodes
         boolean[] visited = new boolean[n];
         for(int i=0; i<n; i++) {
@@ -139,7 +139,7 @@ public class TaxiScheduling {
         return path;
     }
     
-    public void getOrders(String s) { //Get the client information from input.
+    private void getOrders(String s) { //Get the client information from input.
         int p = Integer.parseInt(s.split(" ")[0]); //Get the first element indicating the amount of orders
         for(int i=0; i<p;i++){
             int loc = Integer.parseInt(s.split(" ")[i*2+1]);
@@ -152,7 +152,7 @@ public class TaxiScheduling {
         }
     }
     
-    public boolean directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
+    private boolean directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
         //System.out.println(t.path);
         //System.out.println(t.getLoc());
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
@@ -179,7 +179,7 @@ public class TaxiScheduling {
         return false;
     }
     
-    public void setInitialPos(){
+    private void setInitialPos(){
         for(Taxi taxi:taxis){
             taxi.setLoc((int) (Math.random()*n));
             //System.out.println("Taxi "+taxi.getNum()+" to pos: "+taxi.getLoc());
@@ -205,17 +205,16 @@ public class TaxiScheduling {
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
-            
-            for (int i=0; i<taxis.length; i++){
-                
-                if(taxis[i].isEmpty() && !orderQueue.isEmpty()) {
-                    taxis[i].clients.add(orderQueue.poll());
-                    directWalk(taxis[i], taxis[i].clients.get(0));
-                } else if(!taxis[i].isEmpty()) {
-                    directWalk(taxis[i], taxis[i].clients.get(0));
-                } 
-                
-                
+
+            for (Taxi taxi : taxis) {
+                if (taxi.isEmpty() && !orderQueue.isEmpty()) {
+                    taxi.clients.add(orderQueue.poll());
+                    directWalk(taxi, taxi.clients.get(0));
+                } else if (!taxi.isEmpty()) {
+                    directWalk(taxi, taxi.clients.get(0));
+                }
+
+
                 //System.out.println(taxis[0].getNum()+taxis[0].clients.get(0).getLoc());
             }
             
@@ -224,8 +223,8 @@ public class TaxiScheduling {
             time++;
             System.out.println(time);
             boolean empty = true;
-            for(int i=0; i<taxis.length; i++) {
-                empty &= taxis[i].isEmpty();
+            for (Taxi taxi : taxis) {
+                empty &= taxi.isEmpty();
             }
             if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty){
                 done=true;
