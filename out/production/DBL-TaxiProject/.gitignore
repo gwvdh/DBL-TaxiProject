@@ -1,8 +1,0 @@
-*.txt
-out/production/DBL-TaxiProject/taxi/Taxi.class
-*.xml
-DBL-TaxiProject.iml
-out/production/DBL-TaxiProject/manifest.mf
-*.properties
-out/production/DBL-TaxiProject/README.md
-*.class
