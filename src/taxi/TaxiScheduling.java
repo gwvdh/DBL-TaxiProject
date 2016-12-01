@@ -81,8 +81,51 @@ public class TaxiScheduling {
         }
         System.out.printf("\n");
     }
+
+    /*public Integer[] bfsShortestPath(int start, int goal){
+        if (nodes[start].distance == null){
+            Queue<Integer> nodeQueue = new LinkedList<>();
+            Integer[] distance = new Integer[n];
+            boolean done = false;
+            int current = start;
+            distance[current] = 0;
+            while(!done){
+                for(int i=0; i<n; i++){
+                    if(nodes[current].isAdj(i) && distance[i] == null){
+                        distance[i] = distance[current]+1;
+                        nodeQueue.add(i);
+                    }
+                }
+                if(nodeQueue.isEmpty()){
+                    done = true;
+                } else {
+                    current = nodeQueue.poll();
+                }
+            }
+            nodes[start].setDistance(distance);
+        }
+        Integer[] distance = nodes[start].getDistance();
+        Integer[] path = new Integer[distance[goal]];
+        int current = goal;
+        for(int i=distance[goal]-1; i>=0; i--) { //Walk backwards from the goal to the source to find the shortest path
+            //System.out.println(i);
+            path[i] = current;
+            int smallest = 2*n;
+            int index = -1;
+            for(int j=0; j<n; j++) {
+                if(distance[j]<smallest && nodes[current].isAdj(j)) {
+                    smallest = distance[j];
+                    index = j;
+                }
+            }
+            current = index;
+        }
+        return path;
+    }*/
     
-    private Integer[] inefficientShortestPath(int start, int goal) { //Shortest path according to Dijkstra
+    
+    
+    /*public Integer[] inefficientShortestPath(int start, int goal) { //Shortest path according to Dijkstra
         Integer[] distance  = new Integer[n];//n amount of nodes
         boolean[] visited = new boolean[n];
         for(int i=0; i<n; i++) {
@@ -137,7 +180,7 @@ public class TaxiScheduling {
         }
         //System.out.println(Arrays.toString(distance));
         return path;
-    }
+    }*/
 
     // from wikipedia BFS non-recursive implementation
     private Node BreadthFirstSearch(Node root) {
@@ -190,13 +233,13 @@ public class TaxiScheduling {
         } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
             //System.out.println("B");
             if(t.path.isEmpty()){
-                t.setPath(inefficientShortestPath(t.getLoc(), c.getLoc()));
+                //t.setPath(bfsShortestPath(t.getLoc(), c.getLoc()));
             }
             t.setLoc(t.getPath());
         } else if(t.getLoc() == c.getLoc() && !t.isIn(c)){
             //System.out.println("C");
             t.addPas(c);
-            Integer[] path = inefficientShortestPath(t.getLoc(), c.getDest());
+            Integer[] path = {0};// = bfsShortestPath(t.getLoc(), c.getDest());
             t.setPath(path);
             c.setShortest(path.length);
         } else if(t.getLoc() != c.getDest() && t.isIn(c)){
