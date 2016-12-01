@@ -8,7 +8,7 @@ package taxi;
 
 
 public class Customer {
-    public enum Status {
+    enum Status {
         WAITING, TRANSIT, ARRIVED
     }
     
@@ -30,32 +30,32 @@ public class Customer {
         status = Status.WAITING;
     }
     
-    public double cost(int a, int c, int shortest){
+    double cost(int a, int c, int shortest){
         double aa = (double)(a);
         double cc = (double)(c);
         double ss = (double)(shortest);
         return Math.pow((aa-cc)/Math.pow(ss+2,alpha), 2.0);
     }
     
-    public Status getStatus(){
+    Status getStatus(){
         return status;
     }
-    public int getLoc(){
+    int getLoc(){
         return this.location;
     }
-    public int getDest(){
+    int getDest(){
         return this.destination;
     }
-    public void setShortest(int shortest){
+    void setShortest(int shortest){
         this.shortest=shortest;
     }
-    public void setLoc(int l){
+    void setLoc(int l){
         this.location = l;
     }
-    public void setStatus(Status s){
+    void setStatus(Status s){
         status = s;
     }
-    public double arrived(int time){
+    double arrived(int time){
         status = Status.ARRIVED;
         return cost(time, startTime, shortest);
     }

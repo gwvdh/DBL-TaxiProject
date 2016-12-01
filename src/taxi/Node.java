@@ -11,10 +11,11 @@ import java.util.ArrayList;
  *
  * @author s151341
  */
-public class Node {
+class Node {
     int id;
     boolean[] adjacent;
     int distance;
+    Taxi priorityTaxi;
     Node parent;
     ArrayList<Taxi> taxiList = new ArrayList<>();
     ArrayList<Customer> customers = new ArrayList<>();
@@ -22,6 +23,7 @@ public class Node {
     Node(int id, boolean[] adj){
         this.id = id;
         this.adjacent = adj;
+        priorityTaxi = null; // temporary solution
     }
     
     public void addCustomer(Customer customer){
@@ -35,13 +37,6 @@ public class Node {
         }
         return false;
     }
-    /*public boolean isInbound(){
-        return !taxiInbound.isEmpty();
-    }*/
-
-    /*public Taxi getInbount(){//Get first inbound
-        return taxiInbound.get(0);
-    }*/
 
     public boolean isAdj(int node){
         return adjacent[node];
@@ -67,8 +62,8 @@ public class Node {
         taxiList.add(taxi);
     }
 
-    public ArrayList<Taxi> getTaxis(){
-        return taxiList;
+    public Taxi getTaxi(){
+        return priorityTaxi;
     }
 
     public boolean hasTaxi(){

@@ -10,58 +10,71 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class TaxiScheduling {
+
+    // input variables
     int l;
     double alpha;
     int m;
     int x;
     int c;
     int n;
-    
+    int trainT;
+    int totalT;
+
+    // bookkeeping variables
     int time;
     double totalCost;
-    
+
+    // data sets
     Node[] nodes;
     Taxi[] taxis;
+
     TaxiScanner scanner = TaxiScanner.getInstance();
-    //boolean[][] adMat; //Adjacency matrix
-    Queue<Customer> orderQueue = new LinkedList<Customer>();
-    
-    private TaxiScheduling() { //Get the first lines of code that give the parameters and the graph structure.
+
+    Queue<Customer> orderQueue = new LinkedList<>();
+
+    // constructor that fetches the input parameters
+    private TaxiScheduling() {
         time = 0;
         totalCost=0;
+
         l = Integer.parseInt(scanner.nextLine());
         alpha = Double.parseDouble(scanner.nextLine());
         m = Integer.parseInt(scanner.nextLine());
         String[] parts = scanner.nextLine().split(" ");
         x = Integer.parseInt(parts[0]);
+
         taxis = new Taxi[x]; //Initialize the taxi's
+
         for(int i=0; i<x; i++){
             Taxi taxi = new Taxi(c);
             taxi.ID = i;
             taxis[i] = taxi;
         }
+
         c = Integer.parseInt(parts[1]);
-//        for(int i=0; i<taxis.length; i++){
-//            taxis[i].setCap(c);
-//        }
         n = Integer.parseInt(scanner.nextLine());
+
         nodes = new Node[n];
+
         for(int i=0;i<n;i++){
             String[] adjacent = scanner.nextLine().split(" ");
             int p = Integer.parseInt(adjacent[0]);
-            boolean[] adj = new boolean[n];//Boolean array, because it has increased performance since we will not manipulate the array, just find items
+            boolean[] adj = new boolean[n]; //Boolean array, because it has increased performance since we will not manipulate the array, just find items
             for(int j=1; j<=p; j++) {
-                //System.out.println(Integer.parseInt(adjacent[j]));
                 adj[Integer.parseInt(adjacent[j])] = true;
-                //adMat[i][Integer.parseInt(adjacent[j])] = true;
             }
+
             Node node = new Node(i,adj);
             nodes[i] = node;
         }
-        scanner.nextLine();//THIS REMOVES T AND T' !!!!!!!!! TEMP SOLUTION>>>
+
+        parts = scanner.nextLine().split(" ");
+        trainT = Integer.parseInt(parts[0]);
+        totalT = Integer.parseInt(parts[1]);
     }
     
-    private void printAdMat() { //Method for printing an adjacency matrix.
+    void printAdMat() { //Method for printing an adjacency matrix.
         for(int j=0; j<=n*2; j++) {
                 System.out.printf("-");
             }
@@ -122,68 +135,9 @@ public class TaxiScheduling {
         }
         return path;
     }*/
-    
-    
-    
-    /*public Integer[] inefficientShortestPath(int start, int goal) { //Shortest path according to Dijkstra
-        Integer[] distance  = new Integer[n];//n amount of nodes
-        boolean[] visited = new boolean[n];
-        for(int i=0; i<n; i++) {
-            if(i==start) {
-                distance[i]=0;//Set starter node distance to 0
-            }else {
-                distance[i]=2*n;//Set other nodes to a high number (should be infinity, 2*n can never be reached)
-            }
-        }
-        int current = start;
-        for(int i=0; i<n; i++) {
-            //System.out.println(current);
-            visited[current] = true;
-            for(int j=0; j<n; j++) {
-                if(nodes[current].isAdj(j) && !visited[j] && distance[current]<distance[j]) {//If the node is adjacent, not visited and the shortest distance:
-                    distance[j]=distance[current]+1;//Set the node distance as previous shortest distance+1 (Distance current node to previous node)
-                    //System.out.println(Arrays.toString(distance));
-                }
-            }
-            //System.out.println(Arrays.toString(visited));
-            //System.out.println(Arrays.toString(distance));
-            //System.out.println(distance.length);
-            int smallest = 2*n;
-            int index = -1;
-            for(int j=0; j<distance.length; j++) {
-                if(distance[j]<smallest && !visited[j]) {
-                    smallest = distance[j];
-                    index = j;
-                }
-                //System.out.println("Smallest: "+smallest+"|Current: "+current);
-            }
-            
-            //System.out.println(Arrays.toString(distance));
-            current = index;
-            //System.out.println("current: "+current);
-        }
-        //System.out.println(Arrays.toString(distance));
-        Integer[] path = new Integer[distance[goal]];
-        current = goal;
-        for(int i=distance[goal]-1; i>=0; i--) { //Walk backwards from the goal to the source to find the shortest path
-            //System.out.println(i);
-            path[i] = current;
-            int smallest = 2*n;
-            int index = -1;
-            for(int j=0; j<n; j++) {
-                if(distance[j]<smallest && nodes[current].isAdj(j)) {
-                    smallest = distance[j];
-                    index = j;
-                }
-            }
-            current = index;
-        }
-        //System.out.println(Arrays.toString(distance));
-        return path;
-    }*/
 
-    // from wikipedia BFS non-recursive implementation
-    private Node BreadthFirstSearch(Node root) {
+    // Overloaded taxi searching BFS, non-recursive implementation
+    Taxi BreadthFirstSearch(Node root) {
         for(Node node : nodes) {
             node.setParent(null);
             node.setDistance(-1);
@@ -202,54 +156,49 @@ public class TaxiScheduling {
                     nodes[i].setParent(current);
                     Q.add(nodes[i]);
                     if(nodes[i].hasTaxi())
-                        return nodes[i];
+                        return nodes[i].getTaxi();
                 }
             }
         }
         return null;
     }
     
-    private void getOrders(String s) { //Get the client information from input.
+    void getOrders(String s) { //Get the client information from input.
         int p = Integer.parseInt(s.split(" ")[0]); //Get the first element indicating the amount of orders
-        for(int i=0; i<p;i++){
+        for(int i = 0; i < p ;i++){
             int loc = Integer.parseInt(s.split(" ")[i*2+1]);
             int dest = Integer.parseInt(s.split(" ")[i*2+2]);
             Customer c = new Customer(loc,dest,time,alpha);
-//            Customer c = new Customer(); //Make new customer
-//            c.setLoc(Integer.parseInt(s.split(" ")[i*2+1])); //Set the first element of the customer as the location (by def)
-//            c.setDest(Integer.parseInt(s.split(" ")[i*2+2])); //Set the second element of the customer as the destination (by def)
             orderQueue.add(c); //Add the customer to the queue
         }
     }
     
-    private boolean directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
-        //System.out.println(t.path);
-        //System.out.println(t.getLoc());
+    void directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
         if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
-            //System.out.println("A");
             totalCost += c.arrived(time);
             t.dropPas();
-            return true;
+            return;
+
         } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
-            //System.out.println("B");
             if(t.path.isEmpty()){
                 //t.setPath(bfsShortestPath(t.getLoc(), c.getLoc()));
             }
             t.setLoc(t.getPath());
+
         } else if(t.getLoc() == c.getLoc() && !t.isIn(c)){
             //System.out.println("C");
             t.addPas(c);
             Integer[] path = {0};// = bfsShortestPath(t.getLoc(), c.getDest());
             t.setPath(path);
             c.setShortest(path.length);
+
         } else if(t.getLoc() != c.getDest() && t.isIn(c)){
-            //System.out.println("D");
             t.setLoc(t.getPath());
         }
-        return false;
+        return;
     }
     
-    private void setInitialPos(){
+    void setInitialPos(){
         for(Taxi taxi:taxis){
             taxi.setLoc((int) (Math.random()*n));
             //System.out.println("Taxi "+taxi.getNum()+" to pos: "+taxi.getLoc());
@@ -257,18 +206,8 @@ public class TaxiScheduling {
         scanner.println("c");
     }
     
-    public void run(){
+    private void run(){
         boolean done=false;
-        //int counter=0;
-        //System.out.println("hi");
-        //initialize(); replaced initialize with constructor
-        //System.out.printf("Initial: %d, %f, %d, %d, %d\n", l, alpha, m, x, c);
-        printAdMat();
-        //System.out.println(Arrays.toString(inefficientShortestPath(2,6)));
-        
-        //Initialize position...
-        //taxis[0].setLoc(0);
-        //scanner.println("c");
         setInitialPos();
         
         while(!done){
@@ -283,16 +222,13 @@ public class TaxiScheduling {
                 } else if (!taxi.isEmpty()) {
                     directWalk(taxi, taxi.clients.get(0));
                 }
-
-
-                //System.out.println(taxis[0].getNum()+taxis[0].clients.get(0).getLoc());
             }
-            
-            //counter++;
             scanner.println("c");
+
             time++;
             System.out.println(time);
             System.out.println(totalCost);
+
             boolean empty = true;
             for (Taxi taxi : taxis) {
                 empty &= taxi.isEmpty();
@@ -302,9 +238,6 @@ public class TaxiScheduling {
             }
         }
     }
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         (new TaxiScheduling()).run();
     }
