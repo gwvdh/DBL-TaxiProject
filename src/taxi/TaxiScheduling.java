@@ -46,10 +46,10 @@ public class TaxiScheduling {
 
         taxis = new Taxi[x]; //Initialize the taxi's
 
-        for(int i=0; i<x; i++){
+        for(int i=1; i<=x; i++){
             Taxi taxi = new Taxi(c);
             taxi.ID = i;
-            taxis[i] = taxi;
+            taxis[i-1] = taxi;
         }
 
         c = Integer.parseInt(parts[1]);
@@ -103,9 +103,17 @@ public class TaxiScheduling {
             int current = start;
             distance[current] = 0;
             while(!done){
+                if(nodes[current].nodeDistance != null){//Add already known distances to the distance array
+                    for(int j=0;j<nodes[current].nodeDistance.length;j++){
+                        if(distance[j] == null || nodes[current].getNodeDistance()[j]+nodes[current].getNodeDistance()[start] < distance[j]){//If it is shorter, add
+                            distance[j] = nodes[current].getNodeDistance()[j]+nodes[current].getNodeDistance()[start];
+                        }
+                    }
+                }
                 for(int i=0; i<n; i++){
-                    if(nodes[current].isAdj(i) && distance[i] == null){
-                        distance[i] = distance[current]+1;
+                    
+                    if(nodes[current].isAdj(i) && (distance[i] == null || distance[i]>distance[current]+1)){//If there is no already found shorter distance:
+                        distance[i] = distance[current]+1;//Add the distance.
                         nodeQueue.add(i);
                     }
                 }
