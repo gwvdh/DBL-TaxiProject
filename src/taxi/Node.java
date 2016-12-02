@@ -6,22 +6,24 @@
 package taxi;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author s151341
  */
-public class Node {
+class Node {
     int id;
     boolean[] adjacent;
-    Integer[] distance;
-    List<Taxi> taxiInbound = new ArrayList<>();
-    List<Customer> customers = new ArrayList<>();
-    
+    int distance;
+    Taxi priorityTaxi;
+    Node parent;
+    ArrayList<Taxi> taxiList = new ArrayList<>();
+    ArrayList<Customer> customers = new ArrayList<>();
+
     Node(int id, boolean[] adj){
         this.id = id;
         this.adjacent = adj;
+        priorityTaxi = null; // temporary solution
     }
     
     public void addCustomer(Customer customer){
@@ -35,19 +37,36 @@ public class Node {
         }
         return false;
     }
-    public boolean isInbound(){
-        return !taxiInbound.isEmpty();
-    }
-    public Taxi getInbount(){//Get first inbound
-        return taxiInbound.get(0);
-    }
+
     public boolean isAdj(int node){
         return adjacent[node];
     }
-    public void setDistance(Integer[] d){
-        this.distance = d;
+
+    public void setDistance(int d) {
+        distance = d;
     }
-    public Integer[] getDistance(){
+
+    public int getDistance() {
         return distance;
+    }
+
+    public void setParent(Node node) {
+        parent = node;
+    }
+
+    public Node getParent(){
+        return parent;
+    }
+
+    public void addTaxi(Taxi taxi){
+        taxiList.add(taxi);
+    }
+
+    public Taxi getTaxi(){
+        return priorityTaxi;
+    }
+
+    public boolean hasTaxi(){
+        return !taxiList.isEmpty();
     }
 }
