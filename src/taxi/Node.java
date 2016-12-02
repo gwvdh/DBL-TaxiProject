@@ -42,7 +42,15 @@ class Node {
     public boolean isAdj(int node){
         return adjacent[node];
     }
+    
+    public void setNodeDistance(Integer[] d) {
+        nodeDistance = d;
+    }
 
+    public Integer[] getNodeDistance() {
+        return nodeDistance;
+    }
+    
     public void setDistance(int d) {
         distance = d;
     }
