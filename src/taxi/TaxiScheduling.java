@@ -95,11 +95,7 @@ public class TaxiScheduling {
         System.out.printf("\n");
     }
 
-<<<<<<< HEAD
     public Integer[] bfsShortestPath(int start, int goal){//Get shortest path from node start to node goal
-=======
-    public Integer[] bfsShortestPath(int start, int goal){
->>>>>>> origin/master
         if (nodes[start].nodeDistance == null){
             Queue<Integer> nodeQueue = new LinkedList<>();
             Integer[] distance = new Integer[n];
