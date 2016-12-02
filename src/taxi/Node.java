@@ -54,12 +54,6 @@ class Node {
     public void setDistance(int d) {
         distance = d;
     }
-    public void setNodeDistance(Integer[] d){
-        this.nodeDistance = d;
-    }
-    public Integer[] getNodeDistance(){
-        return nodeDistance;
-    }
     public int getDistance() {
         return distance;
     }
