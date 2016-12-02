@@ -67,7 +67,7 @@ public class Taxi {
         return clients.contains(c) && c.status == Status.TRANSIT;
     }
     void addPas(Customer customer) {
-        clients.add(customer);
+        //clients.add(customer);
         customer.setStatus(Customer.Status.TRANSIT);
         scanner.println("p "+ this.ID+" "+ this.location+" ");
     }

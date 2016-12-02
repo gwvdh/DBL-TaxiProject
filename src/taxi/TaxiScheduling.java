@@ -95,8 +95,8 @@ public class TaxiScheduling {
         System.out.printf("\n");
     }
 
-    /*public Integer[] bfsShortestPath(int start, int goal){
-        if (nodes[start].distance == null){
+    public Integer[] bfsShortestPath(int start, int goal){//Get shortest path from node start to node goal
+        if (nodes[start].nodeDistance == null){
             Queue<Integer> nodeQueue = new LinkedList<>();
             Integer[] distance = new Integer[n];
             boolean done = false;
@@ -115,9 +115,9 @@ public class TaxiScheduling {
                     current = nodeQueue.poll();
                 }
             }
-            nodes[start].setDistance(distance);
+            nodes[start].setNodeDistance(distance);
         }
-        Integer[] distance = nodes[start].getDistance();
+        Integer[] distance = nodes[start].getNodeDistance();
         Integer[] path = new Integer[distance[goal]];
         int current = goal;
         for(int i=distance[goal]-1; i>=0; i--) { //Walk backwards from the goal to the source to find the shortest path
@@ -134,7 +134,7 @@ public class TaxiScheduling {
             current = index;
         }
         return path;
-    }*/
+    }
 
     // Overloaded taxi searching BFS, non-recursive implementation
     Taxi BreadthFirstSearch(Node root) {
@@ -181,7 +181,7 @@ public class TaxiScheduling {
 
         } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
             if(t.path.isEmpty()){
-                //t.setPath(bfsShortestPath(t.getLoc(), c.getLoc()));
+                t.setPath(bfsShortestPath(t.getLoc(), c.getLoc()));
             }
             t.setLoc(t.getPath());
 
@@ -193,6 +193,9 @@ public class TaxiScheduling {
             c.setShortest(path.length);
 
         } else if(t.getLoc() != c.getDest() && t.isIn(c)){
+            if(t.path.isEmpty()){
+                t.setPath(bfsShortestPath(t.getLoc(), c.getDest()));
+            }
             t.setLoc(t.getPath());
         }
         return;
