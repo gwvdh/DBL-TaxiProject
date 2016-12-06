@@ -54,11 +54,13 @@ public class Taxi {
     boolean isEmpty() {
         return clients.isEmpty();
     }
-    void setPath(Integer[] p){
+    void setPath(int[] p){
         if(path.isEmpty()){
             destination = p[p.length-1];
         }
-        path.addAll(Arrays.asList(p) );
+        for(int i=0; i<p.length; i++){
+            path.add(p[i]);
+        }
     }
     void setCap(int c){
         capacity = c;
