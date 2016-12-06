@@ -15,7 +15,7 @@ class Node {
     int id;
     boolean[] adjacent;
     int distance;
-    Integer[] nodeDistance;
+    int[] nodeDistance;
     Taxi priorityTaxi;
     Node parent;
     ArrayList<Taxi> taxiList = new ArrayList<>();
@@ -43,11 +43,11 @@ class Node {
         return adjacent[node];
     }
     
-    public void setNodeDistance(Integer[] d) {
+    public void setNodeDistance(int[] d) {
         nodeDistance = d;
     }
 
-    public Integer[] getNodeDistance() {
+    public int[] getNodeDistance() {
         return nodeDistance;
     }
     
