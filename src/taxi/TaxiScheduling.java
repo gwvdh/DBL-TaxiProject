@@ -127,25 +127,25 @@ public class TaxiScheduling {
         start.setNodeDistance(distance);
     }
     
-    public Integer[] bfsShortestPath(Node start, int goal){//Get shortest path from node start to node goal
+    public int[] bfsShortestPath(Node start, Node goal){//Get shortest path from node start to node goal
         if (start.nodeDistance == null){
             bfsFindAllDist(start);
         }
         int[] distance = start.getNodeDistance();
-        Integer[] path = new Integer[distance[goal]];
-        int current = goal;
-        for(int i=distance[goal]-1; i>=0; i--) { //Walk backwards from the goal to the source to find the shortest path
+        int[] path = new int[distance[goal.id]];
+        Node current = goal;
+        for(int i=distance[goal.id]-1; i>=0; i--) { //Walk backwards from the goal to the source to find the shortest path
             //System.out.println(i);
-            path[i] = current;
+            path[i] = current.id;
             int smallest = 2*n;
             int index = -1;
             for(int j=0; j<n; j++) {
-                if(distance[j]<smallest && nodes[current].isAdj(j)) {
+                if(distance[j]<smallest && current.isAdj(j)) {
                     smallest = distance[j];
                     index = j;
                 }
             }
-            current = index;
+            current = nodes[index];
         }
         return path;
     }
@@ -195,20 +195,20 @@ public class TaxiScheduling {
 
         } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
             if(t.path.isEmpty()){
-                t.setPath(bfsShortestPath(nodes[t.getLoc()], c.getLoc()));
+                t.setPath(bfsShortestPath(nodes[t.getLoc()], nodes[c.getLoc()]));
             }
             t.setLoc(t.getPath());
 
         } else if(t.getLoc() == c.getLoc() && !t.isIn(c)){
             //System.out.println("C");
             t.addPas(c);
-            Integer[] path = bfsShortestPath(nodes[t.getLoc()], c.getDest());
+            int[] path = bfsShortestPath(nodes[t.getLoc()], nodes[c.getDest()]);
             t.setPath(path);
             c.setShortest(path.length);
 
         } else if(t.getLoc() != c.getDest() && t.isIn(c)){
             if(t.path.isEmpty()){
-                t.setPath(bfsShortestPath(nodes[t.getLoc()], c.getDest()));
+                t.setPath(bfsShortestPath(nodes[t.getLoc()], nodes[c.getDest()]));
             }
             t.setLoc(t.getPath());
         }
