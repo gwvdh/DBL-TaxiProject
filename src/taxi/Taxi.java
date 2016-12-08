@@ -18,49 +18,77 @@ import taxi.Customer.Status;
 public class Taxi {
     TaxiScanner scanner = TaxiScanner.getInstance();
     int ID;
-    int location;
+    Node location;
     int capacity; //How many spots are available
-    int destination;
+    Node destination;
     List<Customer> clients = new ArrayList<>();
-    Queue<Integer> path = new LinkedList<>();
+    Queue<Node> path = new LinkedList<>();
 
     Taxi(int cap) {
         capacity = cap;
     }
     
+    void greedySalesman(){
+        Node[] nodes = new Node[path.size()];
+        //System.out.println(this+"| Path1: "+path);
+        for(int i=0; i<path.size(); i++){
+            nodes[i] = path.poll();
+        }
+        Node current = location;
+        for(int i=0; i<nodes.length; i++){
+            int smallest = 0;
+            for(int j=1; j<nodes.length; j++){
+                //System.out.println(this+" J: "+j+" path.size: "+path.size()+" nodes[].length: "+nodes.length+" I: "+i+" smallest: "+smallest);
+                //System.out.println(nodes[smallest]);
+                if(nodes[smallest] == null){
+                    smallest = j;
+                } else if(nodes[j] != null ){
+                    //System.out.println(Arrays.toString(nodes[j].nodeDistance));
+                    if(nodes[smallest].nodeDistance[current.id] > nodes[j].nodeDistance[current.id]){//Distance may not be initialized
+                        smallest = j;
+                    }
+                }
+            }
+            if(nodes[smallest] != null){
+                path.add(nodes[smallest]);
+            }
+            current = nodes[smallest];
+            nodes[smallest] = null;
+        }
+        //System.out.println(this+"| Path2: "+path);
+    }
+    
     int getNum(){
         return this.ID;
     }
-    int getLoc(){
+    Node getLoc(){
         return this.location;
     }
     int getCap(){
         return this.capacity;
     }
-    int getDest(){
+    Node getDest(){
         return destination;
     }
     boolean wantsDrop(){
         for(Customer client: clients){
-            if(client.getDest()==this.getLoc()){
+            if(client.getDest().id==this.getLoc().id){
                 return true;
             }
         }
         return false;
     }
-    int getPath(){
+    Node getPath(){
         return path.poll();
     }
     boolean isEmpty() {
         return clients.isEmpty();
     }
-    void setPath(int[] p){
+    void setPath(Node[] p){
         if(path.isEmpty()){
             destination = p[p.length-1];
         }
-        for(int i=0; i<p.length; i++){
-            path.add(p[i]);
-        }
+        path.addAll(Arrays.asList(p));
     }
     void setCap(int c){
         capacity = c;
@@ -70,28 +98,36 @@ public class Taxi {
     }
     void addPas(Customer customer) {
         //clients.add(customer);
+        this.path.add(customer.getDest());
         customer.setStatus(Customer.Status.TRANSIT);
-        scanner.println("p "+ this.ID+" "+ this.location+" ");
+        scanner.println("p "+ this.ID+" "+ customer.getDest().id+" ");
     }
-    void setLoc(int l){
+    void setLoc(Node l){
+        l.addTaxi(this);
         location = l;
-        scanner.println("m "+ this.ID+" "+ l+" ");
+        scanner.println("m "+ this.ID+" "+ l.id+" ");
     }
     boolean pasDest(){
         for(int i=0; i<clients.size(); i++){
-            if(clients.get(i).getDest() == this.location){
+            if(clients.get(i).getDest().id == this.location.id){
                 return true;
             }
         }
         return false;
     }
-    void dropPas(){
-        for(int i=0; i<clients.size(); i++){
-            if(clients.get(i).getDest() == this.location){
-                scanner.println("d "+ this.ID+" "+ this.location+" ");
-                clients.get(i).setStatus(Customer.Status.ARRIVED);
-                clients.remove(i);
-            }
-        }
+    void dropPas(int i){
+        scanner.println("d "+ this.ID+" "+ this.clients.get(i).getDest().id+" ");
+        clients.get(i).setStatus(Customer.Status.ARRIVED);
+        clients.remove(clients.get(i));
+        //System.out.println(this.ID+" clients: "+clients+" | Path: "+path);
+        
+      
+//        for(int i=0; i<clients.size(); i++){
+//            if(clients.get(i).getDest() == this.location.id){
+//                scanner.println("d "+ this.ID+" "+ this.location.id+" ");
+//                clients.get(i).setStatus(Customer.Status.ARRIVED);
+//                clients.remove(i);
+//            }
+//        }
     }
 }

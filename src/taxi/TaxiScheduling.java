@@ -5,9 +5,10 @@
  */
 package taxi;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import taxi.Customer.Status;
 
 public class TaxiScheduling {
 
@@ -45,14 +46,14 @@ public class TaxiScheduling {
         x = Integer.parseInt(parts[0]);
 
         taxis = new Taxi[x]; //Initialize the taxi's
-
+        c = Integer.parseInt(parts[1]);
         for(int i=1; i<=x; i++){
             Taxi taxi = new Taxi(c);
             taxi.ID = i;
             taxis[i-1] = taxi;
         }
 
-        c = Integer.parseInt(parts[1]);
+        
         n = Integer.parseInt(scanner.nextLine());
 
         nodes = new Node[n];
@@ -65,7 +66,7 @@ public class TaxiScheduling {
                 adj[Integer.parseInt(adjacent[j])] = true;
             }
 
-            Node node = new Node(i,adj);
+            Node node = new Node(i,adj,n);
             nodes[i] = node;
         }
 
@@ -94,7 +95,7 @@ public class TaxiScheduling {
         }
         System.out.printf("\n");
     }
-
+    
     void bfsFindAllDist(Node start){
         Queue<Node> nodeQueue = new LinkedList<>();
         int[] distance = new int[n];
@@ -127,16 +128,16 @@ public class TaxiScheduling {
         start.setNodeDistance(distance);
     }
     
-    public int[] bfsShortestPath(Node start, Node goal){//Get shortest path from node start to node goal
+    public Node[] bfsShortestPath(Node start, Node goal){//Get shortest path from node start to node goal
         if (start.nodeDistance == null){
             bfsFindAllDist(start);
         }
         int[] distance = start.getNodeDistance();
-        int[] path = new int[distance[goal.id]];
+        Node[] path = new Node[distance[goal.id]];
         Node current = goal;
         for(int i=distance[goal.id]-1; i>=0; i--) { //Walk backwards from the goal to the source to find the shortest path
             //System.out.println(i);
-            path[i] = current.id;
+            path[i] = current;
             int smallest = 2*n;
             int index = -1;
             for(int j=0; j<n; j++) {
@@ -165,12 +166,20 @@ public class TaxiScheduling {
         while(!Q.isEmpty()){
             Node current = Q.poll();
             for(int i = 0; i < current.adjacent.length; i++) {
-                if(current.isAdj(i) && current.getDistance() == -1){
+                if(current.isAdj(i) && nodes[i].getDistance() == -1){
                     nodes[i].setDistance(current.getDistance()+1);
                     nodes[i].setParent(current);
                     Q.add(nodes[i]);
-                    if(nodes[i].hasTaxi())
-                        return nodes[i].getTaxi();
+                    
+                    if(nodes[i].hasTaxi()){
+                        ArrayList<Taxi> taxiList = nodes[i].getTaxi();
+                        for(Taxi taxi :taxiList){
+                            //System.out.println("clients.size(): "+taxi.clients.size()+" | capacity: "+taxi.getCap());
+                            if(taxi.clients.size()<taxi.getCap()){
+                                return taxi;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -182,42 +191,95 @@ public class TaxiScheduling {
         for(int i = 0; i < p ;i++){
             int loc = Integer.parseInt(s.split(" ")[i*2+1]);
             int dest = Integer.parseInt(s.split(" ")[i*2+2]);
-            Customer c = new Customer(loc,dest,time,alpha);
+            Customer c = new Customer(loc,nodes[dest],time,alpha);
             orderQueue.add(c); //Add the customer to the queue
         }
     }
     
     void directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
-        if(t.getLoc() == c.getDest() && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
+        if(t.getLoc().id == c.getDest().id && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             totalCost += c.arrived(time);
-            t.dropPas();
+            //t.dropPas();
             return;
 
-        } else if(t.getLoc() != c.getLoc() && !t.isIn(c)) {
+        } else if(t.getLoc().id != c.getLoc() && !t.isIn(c)) {
             if(t.path.isEmpty()){
-                t.setPath(bfsShortestPath(nodes[t.getLoc()], nodes[c.getLoc()]));
+                t.setPath(bfsShortestPath(t.getLoc(), nodes[c.getLoc()]));
             }
             t.setLoc(t.getPath());
 
-        } else if(t.getLoc() == c.getLoc() && !t.isIn(c)){
+        } else if(t.getLoc().id == c.getLoc() && !t.isIn(c)){
             //System.out.println("C");
             t.addPas(c);
-            int[] path = bfsShortestPath(nodes[t.getLoc()], nodes[c.getDest()]);
+            Node[] path = bfsShortestPath(t.getLoc(), c.getDest());
             t.setPath(path);
             c.setShortest(path.length);
 
-        } else if(t.getLoc() != c.getDest() && t.isIn(c)){
+        } else if(t.getLoc().id != c.getDest().id && t.isIn(c)){
             if(t.path.isEmpty()){
-                t.setPath(bfsShortestPath(nodes[t.getLoc()], nodes[c.getDest()]));
+                t.setPath(bfsShortestPath(t.getLoc(), c.getDest()));
             }
             t.setLoc(t.getPath());
         }
         return;
     }
     
+    void calculateAllDistances(){
+        for(Node node : nodes){
+            bfsFindAllDist(node);
+        }
+    }
+    
+    void greedySalesmanWalk(){
+        calculateAllDistances();
+        int orderQueueSize = orderQueue.size();
+        for(int i=0; i<orderQueueSize; i++){
+            //System.out.println("orderQueueSize: "+orderQueueSize+" | i: "+i+" | orderQueue: "+orderQueue.size());
+            Customer customer = orderQueue.poll();
+            //System.out.println("Customer: "+customer+" | node: "+nodes[customer.getLoc()]);
+            Taxi currentTaxi = BreadthFirstSearch(nodes[customer.getLoc()]);
+            if(currentTaxi != null){
+                currentTaxi.clients.add(customer);
+                currentTaxi.path.add(nodes[customer.getLoc()]);
+                currentTaxi.greedySalesman();
+            } else {
+                orderQueue.add(customer);
+            }
+            //System.out.println(currentTaxi.path);
+        } 
+        for(Taxi taxi: taxis){
+            if(taxi.path.peek() == taxi.getLoc()){
+                
+                for(int i=0; i<taxi.clients.size(); i++){
+                    if(taxi.clients.get(i).getDest().id == taxi.location.id && taxi.clients.get(i).getStatus().equals(Status.TRANSIT)){
+                        totalCost += taxi.clients.get(i).arrived(time);
+                        taxi.dropPas(i);
+                        i--;
+                    }
+                }
+                for(Customer customer: taxi.clients){
+                    if(customer.getStatus().equals(Status.WAITING) && customer.getLoc() == taxi.getLoc().id){
+                        taxi.addPas(customer);
+                    }
+                }
+                taxi.path.poll();
+            } else if(!taxi.path.isEmpty()){
+                int dest = taxi.path.peek().id;
+                for(int i=0; i<n; i++){
+                    //System.out.println("Nodes.length: "+nodes.length+"i: "+i);
+                    if(taxi.getLoc().isAdj(i) && taxi.getLoc().getNodeDistance()[dest]>nodes[i].getNodeDistance()[dest]){
+                        //System.out.println(taxi.path.peek().id);
+                        taxi.setLoc(nodes[i]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     void setInitialPos(){
         for(Taxi taxi:taxis){
-            taxi.setLoc((int) (Math.random()*n));
+            taxi.setLoc(nodes[(int) (Math.random()*n)]);
             //System.out.println("Taxi "+taxi.getNum()+" to pos: "+taxi.getLoc());
         }
         scanner.println("c");
@@ -231,15 +293,15 @@ public class TaxiScheduling {
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
-
-            for (Taxi taxi : taxis) {
-                if (taxi.isEmpty() && !orderQueue.isEmpty()) {
-                    taxi.clients.add(orderQueue.poll());
-                    directWalk(taxi, taxi.clients.get(0));
-                } else if (!taxi.isEmpty()) {
-                    directWalk(taxi, taxi.clients.get(0));
-                }
-            }
+            greedySalesmanWalk();
+//            for (Taxi taxi : taxis) {
+//                if (taxi.isEmpty() && !orderQueue.isEmpty()) {
+//                    taxi.clients.add(orderQueue.poll());
+//                    directWalk(taxi, taxi.clients.get(0));
+//                } else if (!taxi.isEmpty()) {
+//                    directWalk(taxi, taxi.clients.get(0));
+//                }
+//            }
             scanner.println("c");
 
             time++;
@@ -250,7 +312,8 @@ public class TaxiScheduling {
             for (Taxi taxi : taxis) {
                 empty &= taxi.isEmpty();
             }
-            if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty){
+            //System.out.println("NextLine: "+scanner.hasNextLine()+" | orderQueue: "+orderQueue.isEmpty()+" | empty: "+empty);
+            if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty || time>200){
                 done=true;
             }
         }

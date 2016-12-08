@@ -16,15 +16,17 @@ class Node {
     boolean[] adjacent;
     int distance;
     int[] nodeDistance;
+    Node[] path;
     Taxi priorityTaxi;
     Node parent;
     ArrayList<Taxi> taxiList = new ArrayList<>();
     ArrayList<Customer> customers = new ArrayList<>();
 
-    Node(int id, boolean[] adj){
+    Node(int id, boolean[] adj, int n){
         this.id = id;
         this.adjacent = adj;
         priorityTaxi = null; // temporary solution
+        this.path = new Node[n];
     }
     
     public void addCustomer(Customer customer){
@@ -32,7 +34,7 @@ class Node {
     }
     public boolean hasCustomerDest(int dest){
         for(Customer c: customers){
-            if(c.getDest()==dest){
+            if(c.getDest().id==dest){
                 return true;
             }
         }
@@ -70,8 +72,8 @@ class Node {
         taxiList.add(taxi);
     }
 
-    public Taxi getTaxi(){
-        return priorityTaxi;
+    public ArrayList<Taxi> getTaxi(){
+        return taxiList;//Temp solution
     }
 
     public boolean hasTaxi(){
