@@ -8,13 +8,13 @@ package taxi;
 
 
 public class Customer {
-    enum Status {
+    public enum Status {
         WAITING, TRANSIT, ARRIVED
     }
     
     int ID;
     int location;
-    int destination;
+    Node destination;
     int startTime;
     int shortest;
     double alpha;
@@ -22,7 +22,7 @@ public class Customer {
     
     Taxi targetTaxi;//Assign customer to taxi
     
-    Customer(int location, int destination, int startTime, double alpha){
+    Customer(int location, Node destination, int startTime, double alpha){
         this.location = location;
         this.destination = destination;
         this.startTime = startTime;
@@ -43,7 +43,7 @@ public class Customer {
     int getLoc(){
         return this.location;
     }
-    int getDest(){
+    Node getDest(){
         return this.destination;
     }
     void setShortest(int shortest){
@@ -59,7 +59,7 @@ public class Customer {
         status = Status.ARRIVED;
         return cost(time, startTime, shortest);
     }
-    public void setDest(int d){
+    public void setDest(Node d){
         this.destination = d;
     }
     public void setTargetTaxi(Taxi taxi){//Assign customer to taxi
