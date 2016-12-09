@@ -239,11 +239,15 @@ public class TaxiScheduling {
             node.sumDistance = sum;
         }
         Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));
-        //System.out.println(avDistNodes);
+//        System.out.printf("[");
+//        for(Node node:avDistNodes){
+//            System.out.printf("%d, ", node.sumDistance);
+//        }
+//        System.out.printf("]\n");
     }
     
     void greedySalesmanWalk(){
-        calculateAllDistances();
+        
         int orderQueueSize = orderQueue.size();
         for(int i=0; i<orderQueueSize; i++){
             //System.out.println("orderQueueSize: "+orderQueueSize+" | i: "+i+" | orderQueue: "+orderQueue.size());
@@ -251,6 +255,9 @@ public class TaxiScheduling {
             //System.out.println("Customer: "+customer+" | node: "+nodes[customer.getLoc()]);
             Taxi currentTaxi = BreadthFirstSearch(nodes[customer.getLoc()]);
             if(currentTaxi != null){
+                if(currentTaxi.clients.isEmpty()){
+                    currentTaxi.path.clear();
+                }
                 currentTaxi.clients.add(customer);
                 currentTaxi.path.add(nodes[customer.getLoc()]);
                 currentTaxi.greedySalesman();
@@ -284,13 +291,25 @@ public class TaxiScheduling {
                         break;
                     }
                 }
+            } else if(taxi.clients.isEmpty() && taxi.path.isEmpty()){
+                for(Node node : avDistNodes){
+                    if(!node.hasTaxi()){
+                        taxi.path.add(node);
+                    }
+                }
             }
         }
     }
     
     void setInitialPos(){
         for(Taxi taxi:taxis){
-            taxi.setLoc(nodes[(int) (Math.random()*n)]);
+            for(Node node : avDistNodes){
+                if(!node.hasTaxi()){
+                    taxi.setLoc(node);
+                    break;
+                }
+            }
+            //taxi.setLoc(nodes[(int) (Math.random()*n)]);
             //System.out.println("Taxi "+taxi.getNum()+" to pos: "+taxi.getLoc());
         }
         scanner.println("c");
@@ -298,6 +317,7 @@ public class TaxiScheduling {
     
     private void run(){
         boolean done=false;
+        calculateAllDistances();
         setInitialPos();
         
         while(!done){
