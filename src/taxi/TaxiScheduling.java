@@ -6,12 +6,14 @@
 package taxi;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
-import taxi.Customer.Status;
+
 
 public class TaxiScheduling {
-
     // input variables
     int l;
     double alpha;
@@ -29,6 +31,8 @@ public class TaxiScheduling {
     // data sets
     Node[] nodes;
     Taxi[] taxis;
+    
+    List<Node> avDistNodes = new ArrayList<>();
 
     TaxiScanner scanner = TaxiScanner.getInstance();
 
@@ -68,6 +72,7 @@ public class TaxiScheduling {
 
             Node node = new Node(i,adj,n);
             nodes[i] = node;
+            avDistNodes.add(node);
         }
 
         parts = scanner.nextLine().split(" ");
@@ -226,8 +231,15 @@ public class TaxiScheduling {
     
     void calculateAllDistances(){
         for(Node node : nodes){
+            int sum=0;
             bfsFindAllDist(node);
+            for(int i:node.getNodeDistance()){
+                sum += i;
+            }
+            node.sumDistance = sum;
         }
+        Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));
+        //System.out.println(avDistNodes);
     }
     
     void greedySalesmanWalk(){
@@ -249,16 +261,15 @@ public class TaxiScheduling {
         } 
         for(Taxi taxi: taxis){
             if(taxi.path.peek() == taxi.getLoc()){
-                
                 for(int i=0; i<taxi.clients.size(); i++){
-                    if(taxi.clients.get(i).getDest().id == taxi.location.id && taxi.clients.get(i).getStatus().equals(Status.TRANSIT)){
+                    if(taxi.clients.get(i).getDest().id == taxi.location.id && taxi.clients.get(i).getStatus().equals(Customer.Status.TRANSIT)){
                         totalCost += taxi.clients.get(i).arrived(time);
                         taxi.dropPas(i);
                         i--;
                     }
                 }
                 for(Customer customer: taxi.clients){
-                    if(customer.getStatus().equals(Status.WAITING) && customer.getLoc() == taxi.getLoc().id){
+                    if(customer.getStatus().equals(Customer.Status.WAITING) && customer.getLoc() == taxi.getLoc().id){
                         taxi.addPas(customer);
                     }
                 }
@@ -313,7 +324,7 @@ public class TaxiScheduling {
                 empty &= taxi.isEmpty();
             }
             //System.out.println("NextLine: "+scanner.hasNextLine()+" | orderQueue: "+orderQueue.isEmpty()+" | empty: "+empty);
-            if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty || time>200){
+            if(!scanner.hasNextLine() && orderQueue.isEmpty() && empty){
                 done=true;
             }
         }

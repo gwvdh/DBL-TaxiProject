@@ -8,7 +8,7 @@ package taxi;
 
 
 public class Customer {
-    enum Status {
+    public enum Status {
         WAITING, TRANSIT, ARRIVED
     }
     

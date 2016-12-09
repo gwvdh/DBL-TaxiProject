@@ -14,6 +14,7 @@ import java.util.ArrayList;
 class Node {
     int id;
     boolean[] adjacent;
+    int sumDistance;
     int distance;
     int[] nodeDistance;
     Node[] path;
@@ -79,4 +80,9 @@ class Node {
     public boolean hasTaxi(){
         return !taxiList.isEmpty();
     }
+    
+    public int compareTo(Node node){
+        return (this.sumDistance-node.sumDistance);
+    }
+    
 }

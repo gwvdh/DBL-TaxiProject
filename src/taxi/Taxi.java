@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import taxi.Customer.Status;
 
 
 
@@ -94,11 +93,12 @@ public class Taxi {
         capacity = c;
     }
     boolean isIn(Customer c){
-        return clients.contains(c) && c.status == Status.TRANSIT;
+        return clients.contains(c) && c.status == Customer.Status.TRANSIT;
     }
     void addPas(Customer customer) {
         //clients.add(customer);
         this.path.add(customer.getDest());
+        //greedySalesman();
         customer.setStatus(Customer.Status.TRANSIT);
         scanner.println("p "+ this.ID+" "+ customer.getDest().id+" ");
     }
