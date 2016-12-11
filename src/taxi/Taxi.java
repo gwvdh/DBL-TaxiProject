@@ -21,40 +21,35 @@ public class Taxi {
     int capacity; //How many spots are available
     Node destination;
     List<Customer> clients = new ArrayList<>();
-    Queue<Node> path = new LinkedList<>();
+    LinkedList<Node> path = new LinkedList<>();
 
     Taxi(int cap) {
         capacity = cap;
     }
     
-    void greedySalesman(){
+    void greedySalesman(){//Order the path such that from each node to the next, it is the shortest distance
         Node[] nodes = new Node[path.size()];
-        //System.out.println(this+"| Path1: "+path);
-        for(int i=0; i<path.size(); i++){
+        for(int i=0; i<path.size(); i++){//Get all nodes from the path
             nodes[i] = path.poll();
         }
         Node current = location;
-        for(int i=0; i<nodes.length; i++){
+        for(int i=0; i<nodes.length; i++){//Reorder nodes
             int smallest = 0;
             for(int j=1; j<nodes.length; j++){
-                //System.out.println(this+" J: "+j+" path.size: "+path.size()+" nodes[].length: "+nodes.length+" I: "+i+" smallest: "+smallest);
-                //System.out.println(nodes[smallest]);
                 if(nodes[smallest] == null){
                     smallest = j;
                 } else if(nodes[j] != null ){
-                    //System.out.println(Arrays.toString(nodes[j].nodeDistance));
-                    if(nodes[smallest].nodeDistance[current.id] > nodes[j].nodeDistance[current.id]){//Distance may not be initialized
+                    if(nodes[smallest].nodeDistance[current.id] > nodes[j].nodeDistance[current.id]){
                         smallest = j;
                     }
                 }
             }
             if(nodes[smallest] != null){
-                path.add(nodes[smallest]);
+                path.add(nodes[smallest]);//Add the node to the queue
             }
             current = nodes[smallest];
-            nodes[smallest] = null;
+            nodes[smallest] = null;//Make sure we won't find the same node twice
         }
-        //System.out.println(this+"| Path2: "+path);
     }
     
     int getNum(){
@@ -98,7 +93,6 @@ public class Taxi {
     void addPas(Customer customer) {
         //clients.add(customer);
         this.path.add(customer.getDest());
-        //greedySalesman();
         customer.setStatus(Customer.Status.TRANSIT);
         scanner.println("p "+ this.ID+" "+ customer.getDest().id+" ");
     }
