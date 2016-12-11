@@ -7,6 +7,7 @@ package taxi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -103,7 +104,7 @@ public class TaxiScheduling {
     void bfsFindAllDist(Node start){
         Queue<Node> nodeQueue = new LinkedList<>();
         int[] distance = new int[n];
-        for(int i=0; i<distance.length; i++){//Set all node distances to infinity (or 2*n also does the trick)
+        for(int i=0; i<distance.length; i++){
             distance[i] = n*2;
         }
         boolean done = false;
@@ -129,7 +130,7 @@ public class TaxiScheduling {
                 current = nodeQueue.poll();
             }
         }
-        start.setNodeDistance(distance);//Put the distances in the object
+        start.setNodeDistance(distance);
     }
     
     public Node[] bfsShortestPath(Node start, Node goal){//Get shortest path from node start to node goal
@@ -203,6 +204,8 @@ public class TaxiScheduling {
     void directWalk(Taxi t, Customer c) { //Direct walk algorithm which goes to the first customer in queue and brings her to her destination
         if(t.getLoc().id == c.getDest().id && t.isIn(c)){ //If the taxi is at the destination of the customer and the customer is in the taxi
             totalCost += c.arrived(time);
+            //t.dropPas();
+            return;
 
         } else if(t.getLoc().id != c.getLoc() && !t.isIn(c)) {
             if(t.path.isEmpty()){
@@ -211,6 +214,7 @@ public class TaxiScheduling {
             t.setLoc(t.getPath());
 
         } else if(t.getLoc().id == c.getLoc() && !t.isIn(c)){
+            //System.out.println("C");
             t.addPas(c);
             Node[] path = bfsShortestPath(t.getLoc(), c.getDest());
             t.setPath(path);
@@ -222,9 +226,10 @@ public class TaxiScheduling {
             }
             t.setLoc(t.getPath());
         }
+        return;
     }
     
-    void calculateAllDistances(){//Calculate all distances from all nodes
+    void calculateAllDistances(){
         for(Node node : nodes){
             int sum=0;
             bfsFindAllDist(node);
@@ -233,7 +238,7 @@ public class TaxiScheduling {
             }
             node.sumDistance = sum;
         }
-        Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));//make a priority array for center nodes
+        Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));
 //        System.out.printf("[");
 //        for(Node node:avDistNodes){
 //            System.out.printf("%d, ", node.sumDistance);
@@ -242,56 +247,61 @@ public class TaxiScheduling {
     }
     
     void greedySalesmanWalk(){
-        int orderQueueSize = orderQueue.size();//Declare length before the loop to prevent intermediate value change
-        for(int i=0; i<orderQueueSize; i++){//Only loop over all non schedualed customers once
+        
+        int orderQueueSize = orderQueue.size();
+        for(int i=0; i<orderQueueSize; i++){
+            //System.out.println("orderQueueSize: "+orderQueueSize+" | i: "+i+" | orderQueue: "+orderQueue.size());
             Customer customer = orderQueue.poll();
-            Taxi currentTaxi = BreadthFirstSearch(nodes[customer.getLoc()]);//Get the nearest taxi
-            if(currentTaxi != null){//If there actually was a taxi found
-                if(currentTaxi.clients.isEmpty() && !currentTaxi.path.isEmpty()){//If the taxi was walking without having schedualed customers
-                    currentTaxi.path.clear();//Remove the current walking goal
+            //System.out.println("Customer: "+customer+" | node: "+nodes[customer.getLoc()]);
+            Taxi currentTaxi = BreadthFirstSearch(nodes[customer.getLoc()]);
+            if(currentTaxi != null){
+                if(currentTaxi.clients.isEmpty()){
+                    currentTaxi.path.clear();
                 }
-                currentTaxi.clients.add(customer);//Add the customer to the taxi
-                currentTaxi.path.add(nodes[customer.getLoc()]);//Add the location of the customer to the path
+                currentTaxi.clients.add(customer);
+                currentTaxi.path.add(nodes[customer.getLoc()]);
                 currentTaxi.greedySalesman();
-            } else {// if there was no taxi found, add customer at the back of the queue again.
+            } else {
                 orderQueue.add(customer);
             }
+            //System.out.println(currentTaxi.path);
         } 
-        for(Taxi taxi: taxis){//Loop through all taxi's to determine their next move.
-            if(taxi.path.peek() == taxi.getLoc()){//If the taxi is at its destination.
-                for(int i=0; i<taxi.clients.size(); i++){//Look if any passenger wants to disembark
+        for(Taxi taxi: taxis){
+            if(taxi.path.peek() == taxi.getLoc()){
+                for(int i=0; i<taxi.clients.size(); i++){
                     if(taxi.clients.get(i).getDest().id == taxi.location.id && taxi.clients.get(i).getStatus().equals(Customer.Status.TRANSIT)){
                         totalCost += taxi.clients.get(i).arrived(time);
-                        taxi.dropPas(i);//Drop the passenger
-                        i--;//Make sure we don't skip a passenger (or get out of bounds)
+                        taxi.dropPas(i);
+                        i--;
                     }
                 }
-                for(Customer customer: taxi.clients){//Look if any passenger wants to get in
+                for(Customer customer: taxi.clients){
                     if(customer.getStatus().equals(Customer.Status.WAITING) && customer.getLoc() == taxi.getLoc().id){
-                        taxi.addPas(customer);//add passenger
+                        taxi.addPas(customer);
                     }
                 }
-                taxi.path.poll();//Remove the destination from the queue.
-                taxi.greedySalesman();
-            } else if(!taxi.path.isEmpty()){//If there is something in the path, but we are not there
+                taxi.path.poll();
+            } else if(!taxi.path.isEmpty()){
                 int dest = taxi.path.peek().id;
-                for(int i=0; i<n; i++){//Go to the next nearest node to the destination.
+                for(int i=0; i<n; i++){
+                    //System.out.println("Nodes.length: "+nodes.length+"i: "+i);
                     if(taxi.getLoc().isAdj(i) && taxi.getLoc().getNodeDistance()[dest]>nodes[i].getNodeDistance()[dest]){
+                        //System.out.println(taxi.path.peek().id);
                         taxi.setLoc(nodes[i]);
                         break;
                     }
                 }
-            } else if(taxi.clients.isEmpty() && taxi.path.isEmpty()){//If the path is empty, walk to the center most node without a taxi
+            } else if(taxi.clients.isEmpty() && taxi.path.isEmpty()){
                 for(Node node : avDistNodes){
                     if(!node.hasTaxi()){
-                        taxi.path.add(node);//Add the center node to the path
+                        taxi.path.add(node);
                     }
                 }
             }
         }
     }
     
-    void setInitialPos(){//Set taxi's at high priority nodes
+    void setInitialPos(){
         for(Taxi taxi:taxis){
             for(Node node : avDistNodes){
                 if(!node.hasTaxi()){
