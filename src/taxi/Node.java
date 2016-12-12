@@ -13,17 +13,19 @@ import java.util.ArrayList;
  */
 class Node {
     int id;
-    boolean[] adjacent;
+    Node[] adjacent;
     int sumDistance;
     int[] nodeDistance;
     Node[] path;
     ArrayList<Taxi> taxiList = new ArrayList<>();
     ArrayList<Customer> customers = new ArrayList<>();
 
-    Node(int id, boolean[] adj, int n){
+    Node(int id, int n){
         this.id = id;
-        this.adjacent = adj;
         this.path = new Node[n];
+        for(int i = 0; i < nodeDistance.length; i++){
+            nodeDistance[i] = -1;
+        }
     }
     
     public void addCustomer(Customer customer){
@@ -42,8 +44,12 @@ class Node {
         return this.id;
     }
 
-    public boolean isAdj(int node){
-        return adjacent[node];
+    public void setAdjacent(Node[] adjacent) {
+        this.adjacent = adjacent;
+    }
+
+    Node[] getAdjacent(){
+        return this.adjacent;
     }
     
     public void setNodeDistance(int[] d) {
@@ -52,6 +58,14 @@ class Node {
 
     public int[] getNodeDistance() {
         return nodeDistance;
+    }
+
+    public void setPath(int id, Node next){
+        path[id] = next;
+    }
+
+    Node[] getPath(){
+        return path;
     }
 
     public void addTaxi(Taxi taxi){
