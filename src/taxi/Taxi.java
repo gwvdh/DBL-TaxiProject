@@ -98,7 +98,7 @@ public class Taxi {
     }
 
     void addPas(Customer customer) {
-        clients.add(customer);
+        
         this.path.add(customer.getDest());
         customer.setStatus(Customer.Status.TRANSIT);
         scanner.println("p "+ this.ID + " "+ customer.getDest().getId()+" ");
@@ -121,6 +121,7 @@ public class Taxi {
         scanner.println("d "+ this.ID+" "+ this.clients.get(i).getDest().id+" ");
         clients.get(i).setStatus(Customer.Status.ARRIVED);
         clients.remove(clients.get(i));
+        
         //System.out.println(this.ID+" clients: "+clients+" | Path: "+path);
         
       
