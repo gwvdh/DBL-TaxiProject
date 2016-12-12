@@ -61,17 +61,20 @@ public class TaxiScheduling {
 
         nodes = new Node[n];
 
-        for(int i=0;i<n;i++){
-            String[] adjacent = scanner.nextLine().split(" ");
-            int p = Integer.parseInt(adjacent[0]);
-            boolean[] adj = new boolean[n]; //Boolean array, because it has increased performance since we will not manipulate the array, just find items
-            for(int j=1; j<=p; j++) {
-                adj[Integer.parseInt(adjacent[j])] = true;
-            }
-
-            Node node = new Node(i,adj,n);
+        for(int i=0;i<n;i++) {
+            Node node = new Node(i, n);
             nodes[i] = node;
             avDistNodes.add(node);
+        }
+
+        for(Node node : nodes){
+            String[] adjacent = scanner.nextLine().split(" ");
+            int d_i = Integer.parseInt(adjacent[0]);
+            Node[] adj = new Node[d_i];
+            for(int i = 0; i <= d_i; i++) {
+                adj[i] = nodes[Integer.parseInt(adjacent[i+1])];
+            }
+            node.setAdjacent(adj);
         }
 
         parts = scanner.nextLine().split(" ");
@@ -82,7 +85,7 @@ public class TaxiScheduling {
         setInitialPos();
     }
     
-    void printAdMat() { //Method for printing an adjacency matrix.
+    /*void printAdMat() { //Method for printing an adjacency matrix.
         for(int j=0; j<=n*2; j++) {
                 System.out.printf("-");
             }
@@ -101,14 +104,15 @@ public class TaxiScheduling {
             System.out.printf("-");
         }
         System.out.printf("\n");
-    }
+    }*/
     
     void bfsFindAllDist(Node start){
         Queue<Node> nodeQueue = new LinkedList<>();
         int[] distance = new int[n];
-        for(int i=0; i<distance.length; i++){//Set all node distances to infinity (or 2*n also does the trick)
-            distance[i] = n*2;
+        for(int i=0; i<distance.length; i++){//Set all node distances to infinity (or -1 also does the trick)
+            distance[i] = -1;
         }
+
         boolean done = false;
         Node current = start;
         distance[current.id] = 0;
@@ -120,12 +124,15 @@ public class TaxiScheduling {
                     }
                 }
             }
-            for(int i=0; i<n; i++){
-                if(current.isAdj(i) && (distance[i]>distance[current.id]+1)){//If there is no already found shorter distance:
-                    distance[i] = distance[current.id]+1;//Add the distance.
-                    nodeQueue.add(nodes[i]);
+
+            Node[] adj = current.getAdjacent();
+            for(Node node : adj){
+                if(distance[node.getId()] > distance[current.getId()]+1){
+                    distance[node.getId()] = distance[current.getId()]+1;
+                    nodeQueue.add(node);
                 }
             }
+
             if(nodeQueue.isEmpty()){
                 done = true;
             } else {
@@ -135,7 +142,7 @@ public class TaxiScheduling {
         start.setNodeDistance(distance);//Put the distances in the object
     }
     
-    public Node[] bfsShortestPath(Node start, Node goal){//Get shortest path from node start to node goal
+    /*public Node[] bfsShortestPath(Node start, Node goal){//Get shortest path from node start to node goal
         if (start.nodeDistance == null){
             bfsFindAllDist(start);
         }
@@ -156,7 +163,7 @@ public class TaxiScheduling {
             current = nodes[index];
         }
         return path;
-    }
+    }*/
 
     // Overloaded taxi searching BFS, non-recursive implementation
     /*Taxi BreadthFirstSearch(Node root) {
@@ -360,9 +367,11 @@ public class TaxiScheduling {
 
                 } else if(!taxi.path.isEmpty()){//If there is something in the path, but we are not there
                     int dest = taxi.path.peek().id;
-                    for(int i=0; i<n; i++){//Go to the next nearest node to the destination.
-                        if(taxi.getLoc().isAdj(i) && taxi.getLoc().getNodeDistance()[dest]>nodes[i].getNodeDistance()[dest]){
-                            taxi.setLoc(nodes[i]);
+
+                    Node[] adj = taxi.getLoc().getAdjacent();
+                    for(Node node : adj){
+                        if(taxi.getLoc().getNodeDistance()[dest] > node.getNodeDistance()[dest]){
+                            taxi.setLoc(node);
                             break;
                         }
                     }
