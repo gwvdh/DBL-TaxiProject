@@ -51,8 +51,10 @@ public class Taxi {
             nodes[smallest] = null;//Make sure we won't find the same node twice
         }
     }
-    
-    int getNum(){
+
+
+
+    int getId(){
         return this.ID;
     }
     Node getLoc(){
@@ -72,34 +74,39 @@ public class Taxi {
         }
         return false;
     }
-    Node getPath(){
-        return path.poll();
+    LinkedList<Node> getPath(){
+        return this.path;
     }
+
     boolean isEmpty() {
         return clients.isEmpty();
     }
-    void setPath(Node[] p){
-        if(path.isEmpty()){
-            destination = p[p.length-1];
-        }
-        path.addAll(Arrays.asList(p));
+
+    void setPath(LinkedList<Node> path){
+        this.path = path;
     }
     void setCap(int c){
         capacity = c;
     }
+
     boolean isIn(Customer c){
         return clients.contains(c) && c.status == Customer.Status.TRANSIT;
     }
+
+    List<Customer> getClients() {
+        return this.clients;
+    }
+
     void addPas(Customer customer) {
-        //clients.add(customer);
+        clients.add(customer);
         this.path.add(customer.getDest());
         customer.setStatus(Customer.Status.TRANSIT);
-        scanner.println("p "+ this.ID+" "+ customer.getDest().id+" ");
+        scanner.println("p "+ this.ID + " "+ customer.getDest().getId()+" ");
     }
     void setLoc(Node l){
         l.addTaxi(this);
         location = l;
-        scanner.println("m "+ this.ID+" "+ l.id+" ");
+        scanner.println("m "+ this.ID + " " + l.id + " ");
     }
     boolean pasDest(){
         for(int i=0; i<clients.size(); i++){
@@ -109,6 +116,7 @@ public class Taxi {
         }
         return false;
     }
+
     void dropPas(int i){
         scanner.println("d "+ this.ID+" "+ this.clients.get(i).getDest().id+" ");
         clients.get(i).setStatus(Customer.Status.ARRIVED);

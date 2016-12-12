@@ -15,18 +15,14 @@ class Node {
     int id;
     boolean[] adjacent;
     int sumDistance;
-    int distance;
     int[] nodeDistance;
     Node[] path;
-    Taxi priorityTaxi;
-    Node parent;
     ArrayList<Taxi> taxiList = new ArrayList<>();
     ArrayList<Customer> customers = new ArrayList<>();
 
     Node(int id, boolean[] adj, int n){
         this.id = id;
         this.adjacent = adj;
-        priorityTaxi = null; // temporary solution
         this.path = new Node[n];
     }
     
@@ -35,11 +31,15 @@ class Node {
     }
     public boolean hasCustomerDest(int dest){
         for(Customer c: customers){
-            if(c.getDest().id==dest){
+            if(c.getDest().id == dest){
                 return true;
             }
         }
         return false;
+    }
+
+    public int getId(){
+        return this.id;
     }
 
     public boolean isAdj(int node){
@@ -53,21 +53,6 @@ class Node {
     public int[] getNodeDistance() {
         return nodeDistance;
     }
-    
-    public void setDistance(int d) {
-        distance = d;
-    }
-    public int getDistance() {
-        return distance;
-    }
-
-    public void setParent(Node node) {
-        parent = node;
-    }
-
-    public Node getParent(){
-        return parent;
-    }
 
     public void addTaxi(Taxi taxi){
         taxiList.add(taxi);
@@ -79,10 +64,6 @@ class Node {
 
     public boolean hasTaxi(){
         return !taxiList.isEmpty();
-    }
-    
-    public int compareTo(Node node){
-        return (this.sumDistance-node.sumDistance);
     }
     
 }
