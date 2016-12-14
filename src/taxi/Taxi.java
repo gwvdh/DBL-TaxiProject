@@ -101,8 +101,9 @@ public class Taxi {
     }
 
     void addPas(Customer customer) {
-        
-        this.path.add(customer.getDest());
+        if(!this.path.contains(customer.getDest())){
+            this.path.add(customer.getDest());
+        }
         customer.setStatus(Customer.Status.TRANSIT);
         scanner.println("p "+ this.ID + " "+ customer.getDest().getId()+" ");
     }

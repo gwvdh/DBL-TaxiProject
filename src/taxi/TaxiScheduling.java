@@ -240,25 +240,35 @@ public class TaxiScheduling {
             node.sumDistance = sum;
         }
         Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));//make a priority array for center nodes
-        System.out.printf("[");
-        for(Node node:avDistNodes){
-            System.out.printf("%d, ", node.sumDistance);
-        }
-        System.out.printf("]\n");
+//        System.out.printf("[");
+//        for(Node node:avDistNodes){
+//            System.out.printf("%d, ", node.sumDistance);
+//        }
+//        System.out.printf("]\n");
     }
 
     void assignTaxi(Customer c){
         Taxi closest = taxis[0];
+        boolean full = true;
         for(Taxi taxi : taxis){ //Get the nearest taxi
-            if(taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()])
-                closest = taxi;
+            if(taxi.getClients().size() < taxi.getCap()){
+                if(taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()]){
+                    closest = taxi;
+                }
+                full = false;
+            } 
         }
+        if(!full){
+            if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
+                closest.path.clear();//Remove the current walking goal
 
-        if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
-            closest.path.clear();//Remove the current walking goal
-
-        closest.clients.add(c);//Add the customer to the taxi
-        closest.path.add(nodes[c.getLoc()]);//Add the location of the customer to the path
+            closest.clients.add(c);//Add the customer to the taxi
+            if(!closest.path.contains(nodes[c.getLoc()])){
+                closest.path.add(nodes[c.getLoc()]);//Add the location of the customer to the path
+            }
+        } else {
+            orderQueue.add(c);
+        }
     }
 
  /*   void greedySalesmanWalk(){
@@ -347,9 +357,13 @@ public class TaxiScheduling {
             }
 
             // first we assign taxis to the customers in the queue
-            while(!orderQueue.isEmpty()){
+            int lengthQueue = orderQueue.size();
+            for(int i=0; i<lengthQueue; i++){
                 assignTaxi(orderQueue.poll());
             }
+//            while(!orderQueue.isEmpty()){
+//                assignTaxi(orderQueue.poll());
+//            }
 
 
             // carry out all taxis' moves
@@ -393,7 +407,7 @@ public class TaxiScheduling {
                         for(Node node : avDistNodes){
                             if(!node.hasTaxi()){
                                 taxi.path.add(node);
-                                System.out.println("Center Path: "+taxi.path);
+                                //System.out.println("Center Path: "+taxi.path);
                                 break;
                             }
                         }
