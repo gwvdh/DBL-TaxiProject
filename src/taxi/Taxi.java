@@ -6,10 +6,8 @@
 package taxi;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 
 
@@ -76,6 +74,11 @@ public class Taxi {
     }
     LinkedList<Node> getPath(){
         return this.path;
+    }
+
+    void clearAll(){
+        clients.clear();
+        path.clear();
     }
 
     boolean isEmpty() {

@@ -76,6 +76,10 @@ class Node {
         return taxiList;//Temp solution
     }
 
+    void clearTaxis(){
+        taxiList.clear();
+    }
+
     public boolean hasTaxi(){
         return !taxiList.isEmpty();
     }

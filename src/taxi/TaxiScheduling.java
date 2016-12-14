@@ -5,11 +5,7 @@
  */
 package taxi;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 
 public class TaxiScheduling {
@@ -326,11 +322,26 @@ public class TaxiScheduling {
         }
         scanner.println("c");
     }
-    
+
+    void checkTraining(){
+        if(time == trainT){
+            orderQueue.clear();
+            for(Taxi taxi : taxis)
+                taxi.clearAll();
+
+            for(Node node : nodes)
+                node.clearTaxis();
+
+            setInitialPos();
+        }
+    }
+
     private void run(){
         boolean done = false;
 
         while(!done){
+
+
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
