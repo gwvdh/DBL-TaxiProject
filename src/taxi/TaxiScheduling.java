@@ -35,7 +35,7 @@ public class TaxiScheduling {
 
     // constructor that fetches the input parameters
     private TaxiScheduling() {
-        time = 0;
+        time = 1;
         totalCost=0;
 
         l = Integer.parseInt(scanner.nextLine());
@@ -250,15 +250,15 @@ public class TaxiScheduling {
     void assignTaxi(Customer c){
         Taxi closest = taxis[0];
         boolean full = true;
-        for(Taxi taxi : taxis){ //Get the nearest taxi
-            if(taxi.getClients().size() < taxi.getCap()){
-                if(taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()]){
+        for (Taxi taxi : taxis) {  //Get the nearest taxi
+            if (taxi.getClients().size() < taxi.getCap()) {
+                if (taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()]) {
                     closest = taxi;
                 }
                 full = false;
             } 
         }
-        if(!full){
+        if((closest.getClients().size() < closest.getCap()) && !full){
             if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
                 closest.path.clear();//Remove the current walking goal
 
@@ -383,11 +383,9 @@ public class TaxiScheduling {
                             }
                         }
 
-                        for(Customer customer: taxi.clients){//Look if any passenger wants to get in
-                            if(customer.getStatus().equals(Customer.Status.WAITING) && customer.getLoc() == taxi.getLoc().getId()){
-                                taxi.addPas(customer);//add passenger
-                            }
-                        }
+                        taxi.clients.stream().filter((customer) -> (customer.getStatus().equals(Customer.Status.WAITING) && customer.getLoc() == taxi.getLoc().getId())).forEach((customer) -> {
+                            taxi.addPas(customer);//add passenger
+                        }); //Look if any passenger wants to get in
 
                         taxi.path.poll();//Remove the destination from the queue.
                         taxi.greedySalesman();
@@ -412,7 +410,9 @@ public class TaxiScheduling {
                             }
                         }
                     }
+                    //System.out.println(taxi+": "+taxi.getCap()+" | "+taxi.getClients().size());
                 }
+                
                 scanner.println("c");
             }
 
@@ -428,8 +428,8 @@ public class TaxiScheduling {
             
 
             time++;
-            System.out.println(time);
-            System.out.println(totalCost);
+            //System.out.println(time);
+            //System.out.println(totalCost);
 
             boolean empty = true;
             for (Taxi taxi : taxis) {
