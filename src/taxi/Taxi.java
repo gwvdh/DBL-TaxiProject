@@ -101,10 +101,6 @@ public class Taxi {
     }
 
     void addPas(Customer customer) {
-<<<<<<< HEAD
-        
-=======
->>>>>>> refs/remotes/origin/master
         if(!this.path.contains(customer.getDest())){
             this.path.add(customer.getDest());
         }
