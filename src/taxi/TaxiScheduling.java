@@ -23,6 +23,7 @@ public class TaxiScheduling {
     int time;
     double totalCost;
     int diameter;
+    LinkedList<Node> initialPosQ = new LinkedList<>();
 
     // data sets
     Node[] nodes;
@@ -338,7 +339,6 @@ public class TaxiScheduling {
         Node currentNode = avDistNodes.get(0);
         Node secondNode = null;
         int dia = diameter;
-        LinkedList<Node> initialPosQ = new LinkedList<>();
         initialPosQ.add(currentNode);
         int counter=0;
         while(initialPosQ.size()<x){
@@ -361,8 +361,10 @@ public class TaxiScheduling {
             currentNode = initialPosQ.get(counter);
             counter++;
         }  
+        counter = 0;
         for(Taxi taxi : taxis){
-                taxi.setLoc(initialPosQ.poll());
+                taxi.setLoc(initialPosQ.get(counter));
+                counter++;
         }
 //        for(Taxi taxi : taxis){
 //            for(Node node : avDistNodes){
@@ -474,7 +476,7 @@ public class TaxiScheduling {
 
             time++;
             //System.out.println(time);
-            //System.out.println(totalCost);
+            System.out.println(totalCost);
 
             boolean empty = true;
             for (Taxi taxi : taxis) {
