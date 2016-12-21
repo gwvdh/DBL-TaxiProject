@@ -6,10 +6,8 @@
 package taxi;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 
 
@@ -78,6 +76,11 @@ public class Taxi {
         return this.path;
     }
 
+    void clearAll(){
+        clients.clear();
+        path.clear();
+    }
+
     boolean isEmpty() {
         return clients.isEmpty();
     }
@@ -98,7 +101,10 @@ public class Taxi {
     }
 
     void addPas(Customer customer) {
+<<<<<<< HEAD
         
+=======
+>>>>>>> refs/remotes/origin/master
         if(!this.path.contains(customer.getDest())){
             this.path.add(customer.getDest());
         }

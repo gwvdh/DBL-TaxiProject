@@ -5,11 +5,7 @@
  */
 package taxi;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 
 public class TaxiScheduling {
@@ -253,6 +249,7 @@ public class TaxiScheduling {
 
     void assignTaxi(Customer c){
         Taxi closest = taxis[0];
+<<<<<<< HEAD
         int estCost = 2000*n;
         boolean full = true;
         for(Taxi taxi : taxis){ //Get the nearest taxi
@@ -282,6 +279,28 @@ public class TaxiScheduling {
         } else {
             orderQueue.add(c);
         }
+=======
+        boolean full = true;
+        for(Taxi taxi : taxis){ //Get the nearest taxi
+            if(taxi.getClients().size() < taxi.getCap()){
+                if(taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()]){
+                    closest = taxi;
+                }
+                full = false;
+            } 
+        }
+        if(!full){
+            if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
+                closest.path.clear();//Remove the current walking goal
+
+            closest.clients.add(c);//Add the customer to the taxi
+            if(!closest.path.contains(nodes[c.getLoc()])){
+                closest.path.add(nodes[c.getLoc()]);//Add the location of the customer to the path
+            }
+        } else {
+            orderQueue.add(c);
+        }
+>>>>>>> refs/remotes/origin/master
     }
 
  /*   void greedySalesmanWalk(){
@@ -345,11 +364,26 @@ public class TaxiScheduling {
         }
         scanner.println("c");
     }
-    
+
+    void checkTraining(){
+        if(time == trainT){
+            orderQueue.clear();
+            for(Taxi taxi : taxis)
+                taxi.clearAll();
+
+            for(Node node : nodes)
+                node.clearTaxis();
+
+            setInitialPos();
+        }
+    }
+
     private void run(){
         boolean done = false;
 
         while(!done){
+            
+
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
@@ -365,6 +399,7 @@ public class TaxiScheduling {
 
 
             // carry out all taxis' moves
+<<<<<<< HEAD
             for(Taxi taxi: taxis){ //Loop through all taxi's to determine their next move.
                 System.out.println("Path: "+taxi.path);
                 System.out.println("Customers: "+taxi.clients);
@@ -377,38 +412,64 @@ public class TaxiScheduling {
                             taxi.dropPas(i);//Drop the passenger
                             clientSize = taxi.getClients().size();
                             i--;//Make sure we don't skip a passenger (or get out of bounds)
+=======
+            if(time == trainT){
+                checkTraining();
+            } else{
+                for(Taxi taxi: taxis){ //Loop through all taxi's to determine their next move.
+                    if(taxi.path.peek() == taxi.getLoc()){ //If the taxi is at its destination.
+
+                        int clientSize = taxi.getClients().size();
+                        for(int i=0; i < clientSize; i++){ //Look if any passenger wants to disembark
+                            if(taxi.clients.get(i).getDest().getId() == taxi.location.getId() && taxi.clients.get(i).getStatus().equals(Customer.Status.TRANSIT)){
+                                totalCost += taxi.clients.get(i).arrived(time);
+                                taxi.dropPas(i);//Drop the passenger
+                                clientSize = taxi.getClients().size();
+                                i--;//Make sure we don't skip a passenger (or get out of bounds)
+                            }
+>>>>>>> refs/remotes/origin/master
                         }
-                    }
 
-                    for(Customer customer: taxi.clients){//Look if any passenger wants to get in
-                        if(customer.getStatus().equals(Customer.Status.WAITING) && customer.getLoc() == taxi.getLoc().getId()){
-                            taxi.addPas(customer);//add passenger
+                        for(Customer customer: taxi.clients){//Look if any passenger wants to get in
+                            if(customer.getStatus().equals(Customer.Status.WAITING) && customer.getLoc() == taxi.getLoc().getId()){
+                                taxi.addPas(customer);//add passenger
+                            }
                         }
-                    }
 
-                    taxi.path.poll();//Remove the destination from the queue.
-                    taxi.greedySalesman();
+                        taxi.path.poll();//Remove the destination from the queue.
+                        taxi.greedySalesman();
 
-                } else if(!taxi.path.isEmpty()){//If there is something in the path, but we are not there
-                    int dest = taxi.path.peek().getId();
+                    } else if(!taxi.path.isEmpty()){//If there is something in the path, but we are not there
+                        int dest = taxi.path.peek().getId();
 
-                    Node[] adj = taxi.getLoc().getAdjacent();
-                    for(Node node : adj){
-                        if(taxi.getLoc().getNodeDistance()[dest] > node.getNodeDistance()[dest]){
-                            taxi.setLoc(node);
-                            break;
+                        Node[] adj = taxi.getLoc().getAdjacent();
+                        for(Node node : adj){
+                            if(taxi.getLoc().getNodeDistance()[dest] > node.getNodeDistance()[dest]){
+                                taxi.setLoc(node);
+                                break;
+                            }
                         }
-                    }
 
+<<<<<<< HEAD
                 } else if(taxi.clients.isEmpty() && taxi.path.isEmpty()){//If the path is empty, move to the center most node without a taxi
                     for(Node node : avDistNodes){
                         if(!node.hasTaxi()){
                             taxi.path.add(node);
                             //System.out.println("Center Path: "+taxi.path);
                             break;
+=======
+                    } else if(taxi.clients.isEmpty() && taxi.path.isEmpty()){//If the path is empty, move to the center most node without a taxi
+                        for(Node node : avDistNodes){
+                            if(!node.hasTaxi()){
+                                taxi.path.add(node);
+                                //System.out.println("Center Path: "+taxi.path);
+                                break;
+                            }
+>>>>>>> refs/remotes/origin/master
                         }
                     }
                 }
+                scanner.println("c");
             }
 
 //            for (Taxi taxi : taxis) {
@@ -418,8 +479,9 @@ public class TaxiScheduling {
 //                } else if (!taxi.isEmpty()) {
 //                    directWalk(taxi, taxi.clients.get(0));
 //                }
-//            }
-            scanner.println("c");
+//            
+            
+            
 
             time++;
             System.out.println(time);
