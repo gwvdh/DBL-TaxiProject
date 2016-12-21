@@ -32,7 +32,7 @@ public class TaxiScanner {
      */
     private TaxiScanner(){
         state = State.INITIAL;
-        File input = new File("input.txt");//Put the path to the file here
+        File input = new File("C:\\Users\\s151341\\Documents\\TUe\\2IO90 - DBL Algorithms\\Test Data\\prototypeS\\005.in");//Put the path to the file here
         try {
             scanner = new Scanner(input);
         } catch (FileNotFoundException e) {
@@ -58,7 +58,6 @@ public class TaxiScanner {
      */
     public boolean hasNextLine(){
         return scanner.hasNextLine();
-        
     }
 
     /**
@@ -109,9 +108,11 @@ public class TaxiScanner {
         if (state != State.AWAITINGPRINT) {
             throw new IllegalStateException("Print called while not in AWAITINGPRINT state");
         }
+
         if (s.charAt(s.length() - 1) == 'c' && hasNextLine()) {
             state = State.AWAITINGNEXTLINE;
         }
+
         System.out.println(s);
     }
 }
