@@ -22,6 +22,7 @@ public class TaxiScheduling {
     // bookkeeping variables
     int time;
     double totalCost;
+    int diameter;
 
     // data sets
     Node[] nodes;
@@ -35,7 +36,7 @@ public class TaxiScheduling {
 
     // constructor that fetches the input parameters
     private TaxiScheduling() {
-        time = 0;
+        time = 1;
         totalCost=0;
 
         l = Integer.parseInt(scanner.nextLine());
@@ -236,6 +237,9 @@ public class TaxiScheduling {
             bfsFindAllDist(node);
             for(int i : node.getNodeDistance()){
                 sum += i;
+                if(i>diameter){
+                    diameter = i;
+                }
             }
             node.sumDistance = sum;
         }
@@ -260,9 +264,9 @@ public class TaxiScheduling {
                         closest = taxi;
                         estCost = taxi.getLoc().nodeDistance[c.getLoc()];
                     }
-                }else if((taxi.getLoc().nodeDistance[c.getLoc()]+taxi.path.peek().nodeDistance[c.getDest().id])*Math.max(taxi.clients.size(),1) <estCost){
+                }else if((taxi.getLoc().nodeDistance[c.getLoc()]+c.getDest().getNodeDistance()[c.getLoc()]+taxi.path.peek().nodeDistance[c.getDest().id])*Math.max(taxi.clients.size(),1) <estCost){
                     closest = taxi;
-                    estCost = (taxi.getLoc().nodeDistance[c.getLoc()]+taxi.path.peek().nodeDistance[c.getDest().id])*Math.max(taxi.clients.size(),1);
+                    estCost = (taxi.getLoc().nodeDistance[c.getLoc()]+c.getDest().getNodeDistance()[c.getLoc()]+taxi.path.peek().nodeDistance[c.getDest().id])*Math.max(taxi.clients.size(),1);
                 }
                 full = false;
             } 
@@ -331,16 +335,48 @@ public class TaxiScheduling {
     }*/
     
     void setInitialPos(){//Set taxi's at high priority nodes
-        for(Taxi taxi : taxis){
-            for(Node node : avDistNodes){
-                if(!node.hasTaxi()){
-                    taxi.setLoc(node);
-                    break;
+        Node currentNode = avDistNodes.get(0);
+        Node secondNode = null;
+        int dia = diameter;
+        LinkedList<Node> initialPosQ = new LinkedList<>();
+        initialPosQ.add(currentNode);
+        int counter=0;
+        while(initialPosQ.size()<x){
+            for(int i=0; i<n; i++){
+                if(secondNode == null && currentNode.getNodeDistance()[i]==(dia/2)){
+                    secondNode = nodes[i];
+                    initialPosQ.add(nodes[i]);
+                } else if(currentNode.getNodeDistance()[i]==(dia/2) && secondNode.getNodeDistance()[i]>(dia/4)){
+                    secondNode = nodes[i];
+                    initialPosQ.add(nodes[i]);
                 }
             }
+            
+//            for(int i=0; i<n; i++){
+//                if(currentNode.getNodeDistance()[i]==(dia/2)){
+//                    initialPosQ.add(nodes[i]);
+//                }
+//            }
+            dia = dia/2;
+            currentNode = initialPosQ.get(counter);
+            counter++;
+        }  
+        for(Taxi taxi : taxis){
+                taxi.setLoc(initialPosQ.poll());
         }
+//        for(Taxi taxi : taxis){
+//            for(Node node : avDistNodes){
+//                if(!node.hasTaxi()){
+//                    taxi.setLoc(node);
+//                    break;
+//                }
+//            }
+//        }
         scanner.println("c");
     }
+    
+    
+    
 
     void checkTraining(){
         if(time == trainT){
@@ -350,7 +386,8 @@ public class TaxiScheduling {
 
             for(Node node : nodes)
                 node.clearTaxis();
-
+            
+            totalCost = 0;
             setInitialPos();
         }
     }
@@ -436,8 +473,8 @@ public class TaxiScheduling {
             
 
             time++;
-            System.out.println(time);
-            System.out.println(totalCost);
+            //System.out.println(time);
+            //System.out.println(totalCost);
 
             boolean empty = true;
             for (Taxi taxi : taxis) {
