@@ -252,7 +252,7 @@ public final class TaxiScheduling {
             if(scanner.hasNextLine()){
                 getOrders(scanner.nextLine());
             }
-            System.out.println(orderQueue);
+            //System.out.println(orderQueue);
             // first we assign taxis to the customers in the queue
             int lengthQueue = orderQueue.size();
             for(int i=0; i<lengthQueue; i++){
@@ -264,8 +264,12 @@ public final class TaxiScheduling {
 
 
             // carry out all taxis' moves
-            if(time == trainT){
+            if(time <= trainT){
                 checkTraining();
+                if(time != trainT){
+                    scanner.println("c");
+                }
+                
             } else{
                 for(Taxi taxi: taxis){ //Loop through all taxi's to determine their next move.
                     if(taxi.path.peek() == taxi.getLoc()){ //If the taxi is at its destination.
@@ -331,8 +335,8 @@ public final class TaxiScheduling {
             
 
             time++;
-            System.out.println(time);
-            System.out.println(totalCost);
+            //System.out.println(time);
+            //System.out.println(totalCost);
 
             boolean empty = true;
             for (Taxi taxi : taxis) {
