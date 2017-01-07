@@ -201,7 +201,6 @@ public final class TaxiScheduling {
         Taxi closest = taxis[0];
         int estCost = 2000*n;
         boolean full = true;
-<<<<<<< HEAD
         for(Taxi taxi : taxis){ //Get the nearest taxi
             //System.out.println(taxi+" "+taxi.getCap()+": "+taxi.getClients());
             //if(taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()])
@@ -212,11 +211,6 @@ public final class TaxiScheduling {
                         estCost = taxi.getLoc().nodeDistance[c.getLoc()];
                     }
                 }else if((taxi.getLoc().nodeDistance[c.getLoc()]+c.getDest().getNodeDistance()[c.getLoc()]+taxi.path.peek().nodeDistance[c.getDest().id])*Math.max(taxi.clients.size(),1) <estCost){
-=======
-        for (Taxi taxi : taxis) {  //Get the nearest taxi
-            if (taxi.getClients().size() < taxi.getCap()) {
-                if (taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()]) {
->>>>>>> refs/remotes/origin/master
                     closest = taxi;
                     estCost = (taxi.getLoc().nodeDistance[c.getLoc()]+c.getDest().getNodeDistance()[c.getLoc()]+taxi.path.peek().nodeDistance[c.getDest().id])*Math.max(taxi.clients.size(),1);
                 }
@@ -237,7 +231,6 @@ public final class TaxiScheduling {
     }
     
     void setInitialPos(){//Set taxi's at high priority nodes
-<<<<<<< HEAD
         Node currentNode = avDistNodes.get(0);
         Node secondNode = null;
         int dia = diameter;
@@ -265,19 +258,8 @@ public final class TaxiScheduling {
         }  
         counter = 0;
         for(Taxi taxi : taxis){
-                taxi.setLoc(initialPosQ.get(counter));
-                counter++;
-=======
-        for(Taxi taxi : taxis){
-            Node location = avDistNodes.get(0);
-            for(Node node : avDistNodes){
-                if(!node.hasTaxi()){
-                    location = node;
-                    break;
-                } 
-            }
-            taxi.setLoc(location);
->>>>>>> refs/remotes/origin/master
+            taxi.setLoc(initialPosQ.get(counter));
+            counter++;
         }
 //        for(Taxi taxi : taxis){
 //            for(Node node : avDistNodes){
@@ -328,11 +310,11 @@ public final class TaxiScheduling {
 
 
             // carry out all taxis' moves
-            if(time <= trainT){
+            if(time == trainT){
                 checkTraining();
-                if(time != trainT){
-                    scanner.println("c");
-                }
+//                if(time != trainT){
+//                    scanner.println("c");
+//                }
                 
             } else{
                 for(Taxi taxi: taxis){ //Loop through all taxi's to determine their next move.
@@ -399,11 +381,7 @@ public final class TaxiScheduling {
 
             time++;
             //System.out.println(time);
-<<<<<<< HEAD
-            System.out.println(totalCost);
-=======
             //System.out.println(totalCost);
->>>>>>> refs/remotes/origin/master
 
             boolean empty = true;
             for (Taxi taxi : taxis) {
