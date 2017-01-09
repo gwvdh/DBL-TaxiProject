@@ -16,6 +16,7 @@ public class Taxi {
     TaxiScanner scanner = TaxiScanner.getInstance();
     int ID;
     Node location;
+    Node baseLoc;
     int capacity; //How many spots are available
     Node destination;
     List<Customer> clients = new ArrayList<>();
@@ -63,6 +64,12 @@ public class Taxi {
     }
     Node getDest(){
         return destination;
+    }
+    void setBase(Node n){
+        baseLoc = n;
+    }
+    Node getBase(){
+        return this.baseLoc;
     }
     boolean wantsDrop(){
         for(Customer client: clients){
