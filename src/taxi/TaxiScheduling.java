@@ -49,14 +49,14 @@ public final class TaxiScheduling {
         taxis = new Taxi[x]; //Initialize the taxi's
         c = Integer.parseInt(parts[1]);
         for(int i = 0 ; i < x; i++){
-            Taxi taxi = new Taxi(c);
+            Taxi taxi = new Taxi(c,n);
             taxi.ID = i + 1;
             taxis[i] = taxi;
         }
 
         
         n = Integer.parseInt(scanner.nextLine());
-
+        System.out.println("Amount of nodes: "+n);
         nodes = new Node[n];
 
         for(int i=0;i<n;i++) {
@@ -148,6 +148,7 @@ public final class TaxiScheduling {
                 int loc = Integer.parseInt(parts[i*2+1]);
                 int dest = Integer.parseInt(parts[i*2+2]);
                 Customer customer = new Customer(loc,nodes[dest],time,alpha);
+                System.out.println("Distance from customer to destination: "+customer.getDest().getNodeDistance()[loc]);
                 orderQueue.add(customer); //Add the customer to the queue
             }
         }
@@ -189,6 +190,7 @@ public final class TaxiScheduling {
             }
             node.sumDistance = sum;
         }
+        System.out.println("Diameter: "+diameter);
         Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));//make a priority array for center nodes
 //        System.out.printf("[");
 //        for(Node node:avDistNodes){
@@ -216,9 +218,10 @@ public final class TaxiScheduling {
         pathCost += distance;
         //System.out.println(alpha);
         if(alpha>0.5){
-            return (taxi.getLoc().nodeDistance[cust.getLoc()]+cust.getDest().getNodeDistance()[cust.getLoc()]+taxi.path.peek().nodeDistance[cust.getDest().id])*Math.max(taxi.clients.size(),1);
+            return (taxi.getLoc().getNodeDistance()[cust.getLoc()]+cust.getDest().getNodeDistance()[cust.getLoc()]+taxi.path.peek().getNodeDistance()[cust.getDest().id])*Math.max(taxi.clients.size(),1);
         } else{
-            return Math.pow((pathCost*Math.max(taxi.clients.size(),1))/(Math.pow((pathCost+2)*Math.max(taxi.clients.size(),1), alpha)),2);//      pathCost*Math.max(taxi.clients.size(),1);
+            double tempCost = (pathCost*Math.max(taxi.clients.size(),1))/(Math.pow((pathCost+2)*Math.max(taxi.clients.size(),1), alpha));
+            return tempCost*tempCost;//      pathCost*Math.max(taxi.clients.size(),1);
         }
     }
 
@@ -230,23 +233,26 @@ public final class TaxiScheduling {
             //System.out.println(taxi+" "+taxi.getCap()+": "+taxi.getClients());
             //if(taxi.getLoc().getNodeDistance()[c.getLoc()] < closest.getLoc().getNodeDistance()[c.getLoc()])
             if(taxi.getClients().size() < taxi.getCap()){
-                if(taxi.clients.isEmpty()){
+                if(taxi.clients.isEmpty() || taxi.path.isEmpty()){
                     if(alpha>0.5){
                         if(taxi.getLoc().nodeDistance[c.getLoc()] < estCost){
                             closest = taxi;
                             estCost = taxi.getLoc().nodeDistance[c.getLoc()];
                         }
                     }else{
-                        if(Math.pow((taxi.getLoc().nodeDistance[c.getLoc()]*Math.max(taxi.clients.size(),1))/(Math.pow((taxi.getLoc().nodeDistance[c.getLoc()]+2)*Math.max(taxi.clients.size(),1), alpha)),2)<estCost){//taxi.getLoc().nodeDistance[c.getLoc()] < estCost){
+                        double tempCost = (taxi.getLoc().nodeDistance[c.getLoc()]*Math.max(taxi.clients.size(),1))/(Math.pow((taxi.getLoc().nodeDistance[c.getLoc()]+2)*Math.max(taxi.clients.size(),1), alpha));
+                        if(tempCost*tempCost<estCost){//taxi.getLoc().nodeDistance[c.getLoc()] < estCost){
                             closest = taxi;
-                            estCost = Math.pow((taxi.getLoc().nodeDistance[c.getLoc()]*Math.max(taxi.clients.size(),1))/(Math.pow((taxi.getLoc().nodeDistance[c.getLoc()]+2)*Math.max(taxi.clients.size(),1), alpha)),2);
+                            estCost = tempCost*tempCost;
                         }
                     }
+                    full = false;
                 }else if(getEstCost(c,taxi) <estCost){
                     closest = taxi;
                     estCost = getEstCost(c,taxi);
+                    full = false;
                 }
-                full = false;
+                
             } 
         }
 //            if(taxi.getClients().size() < taxi.getCap()){
@@ -266,10 +272,13 @@ public final class TaxiScheduling {
             if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
                 closest.path.clear();//Remove the current walking goal
             //System.out.println("Chosen taxi: "+closest);
-            closest.clients.add(c);//Add the customer to the taxi
-            if(!closest.path.contains(nodes[c.getLoc()])){
-                closest.path.add(nodes[c.getLoc()]);//Add the location of the customer to the path
+            for(int i=0; i<taxis.length; i++){
+                System.out.printf("Taxi %d (%d): %d | ",i+1,taxis[i].getLoc().getNodeDistance()[c.getLoc()],taxis[i].getClients().size());
             }
+            System.out.printf("\n");
+            closest.clients.add(c);//Add the customer to the taxi
+            System.out.println("Distance of taxi("+closest.ID+") from customer: "+closest.getLoc().getNodeDistance()[c.getLoc()]);
+            closest.greedyInsertSalesman(nodes[c.getLoc()], c.getDest());//InserSalesman of the nodes.
         } else {
             orderQueue.add(c);
         }
@@ -303,6 +312,7 @@ public final class TaxiScheduling {
             currentNode = initialPosQ.get(counter);
             counter++;
         }  
+        System.out.println(initialPosQ);
         counter = 0;
         for(Taxi taxi : taxis){
             taxi.setLoc(initialPosQ.get(counter));
@@ -389,7 +399,22 @@ public final class TaxiScheduling {
 //                        }); //Look if any passenger wants to get in
 
                         taxi.path.poll();//Remove the destination from the queue.
-                        taxi.greedySalesman();
+                        List<Node> askedNodes = new ArrayList<>();
+                        for(Customer cust:taxi.getClients()){//check for unasked destinations in the path
+                            if(!askedNodes.contains(nodes[cust.getLoc()])){
+                                askedNodes.add(nodes[cust.getLoc()]);
+                            }
+                            if(!askedNodes.contains(cust.getDest())){
+                                askedNodes.add(cust.getDest());
+                            }
+                        }
+                        for(int i=0; i<taxi.getPath().size(); i++){
+                            if(!askedNodes.contains(taxi.getPath().get(i))){
+                                taxi.getPath().remove(i);
+                                i--;
+                            }
+                        }
+                        //taxi.greedySalesman();
 
                     } else if(!taxi.path.isEmpty()){//If there is something in the path, but we are not there
                         int dest = taxi.path.peek().getId();

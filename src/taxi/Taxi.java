@@ -14,6 +14,7 @@ import java.util.List;
 
 public class Taxi {
     TaxiScanner scanner = TaxiScanner.getInstance();
+    int n;
     int ID;
     Node location;
     Node baseLoc;
@@ -22,8 +23,9 @@ public class Taxi {
     List<Customer> clients = new ArrayList<>();
     LinkedList<Node> path = new LinkedList<>();
 
-    Taxi(int cap) {
+    Taxi(int cap, int nodes) {
         capacity = cap;
+        n = nodes;
     }
     
     void greedySalesman(){//Order the path such that from each node to the next, it is the shortest distance
@@ -51,7 +53,68 @@ public class Taxi {
         }
     }
 
-
+    void greedyInsertSalesman(Node loc, Node dest){
+        //System.out.println("Before path "+this.ID+": "+this.getPath());
+        int counter = this.path.size()-1;
+        if(counter == -1){//If nothing is in the path, just add the location and destination
+            this.path.add(loc);
+            this.path.add(dest);
+        } else{
+            int distance = 2*n;
+            //Look for shortest distance from current nodes in the path
+            for(int i=counter; i>0; i--){//Destination
+                if(distance>dest.getNodeDistance()[this.getPath().get(i).getId()]){
+                    distance = dest.getNodeDistance()[this.getPath().get(i).getId()];
+                    counter = i;
+                }
+            }
+            if(counter == 0){
+                //Check best arrangement for the three nodes (found node, node before found node (current location of the taxi) and new node)
+                //If currentLoc-Node -> new-Node -> found-Node is the shortest:
+                if(this.location.getNodeDistance()[dest.getId()]+dest.getNodeDistance()[this.getPath().get(counter).id] < this.location.getNodeDistance()[this.getPath().get(counter).id]+dest.getNodeDistance()[this.getPath().get(counter).id]){
+                    this.path.add(counter, dest);
+                } else {
+                    this.path.add(counter+1, dest);
+                }
+            //Check best arrangement for the three nodes (found node, node before found node (base) and new node)
+            //If base-Node -> new-Node -> found-Node is the shortest:
+            } else if(this.getPath().get(counter-1).getNodeDistance()[dest.getId()]+dest.getNodeDistance()[this.getPath().get(counter).id] < this.getPath().get(counter-1).getNodeDistance()[this.getPath().get(counter).id]+dest.getNodeDistance()[this.getPath().get(counter).id]){
+                this.path.add(counter, dest);
+            } else {//else...
+                this.path.add(counter+1, dest);
+            }
+//------------------------------------------------------------------------------            
+            if(!(loc.equals(this.getLoc()))){//Location
+                int counter2 = counter;
+                //Look for shortest distance from current nodes in the path
+                for(int i=counter; i>0; i--){
+                    if(distance>loc.getNodeDistance()[this.getPath().get(i).getId()]){
+                        distance = loc.getNodeDistance()[this.getPath().get(i).getId()];
+                        counter2 = i;
+                    }
+                }
+                if(counter == counter2){
+                    this.path.add(counter2,loc);
+                } else if(counter == 0){
+                    //Check best arrangement for the three nodes (found node, node before found node (current location of the taxi) and new node)
+                    //If currentLoc-Node -> new-Node -> found-Node is the shortest:
+                    if(this.location.getNodeDistance()[loc.getId()]+loc.getNodeDistance()[this.getPath().get(counter2).id] < this.location.getNodeDistance()[this.getPath().get(counter2).id]+loc.getNodeDistance()[this.getPath().get(counter2).id]){
+                        this.path.add(counter2, loc);
+                    } else {
+                        this.path.add(counter2+1, loc);
+                    }
+                //Check best arrangement for the three nodes (found node, node before found node (base) and new node)
+                //If base-Node -> new-Node -> found-Node is the shortest:
+                } else if(this.getPath().get(counter2-1).getNodeDistance()[loc.getId()]+loc.getNodeDistance()[this.getPath().get(counter2).id] < this.getPath().get(counter2-1).getNodeDistance()[this.getPath().get(counter2).id]+loc.getNodeDistance()[this.getPath().get(counter2).id]){
+                    this.path.add(counter2, loc);
+                } else {
+                    this.path.add(counter2+1, loc);
+                }
+            }
+        }
+        //System.out.println("After path "+this.ID+": "+this.getPath());
+        
+    }
 
     int getId(){
         return this.ID;
