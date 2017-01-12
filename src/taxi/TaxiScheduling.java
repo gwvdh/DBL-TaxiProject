@@ -56,7 +56,7 @@ public final class TaxiScheduling {
 
         
         n = Integer.parseInt(scanner.nextLine());
-        System.out.println("Amount of nodes: "+n);
+        
         nodes = new Node[n];
 
         for(int i=0;i<n;i++) {
@@ -148,7 +148,6 @@ public final class TaxiScheduling {
                 int loc = Integer.parseInt(parts[i*2+1]);
                 int dest = Integer.parseInt(parts[i*2+2]);
                 Customer customer = new Customer(loc,nodes[dest],time,alpha);
-                System.out.println("Distance from customer to destination: "+customer.getDest().getNodeDistance()[loc]);
                 orderQueue.add(customer); //Add the customer to the queue
             }
         }
@@ -190,7 +189,6 @@ public final class TaxiScheduling {
             }
             node.sumDistance = sum;
         }
-        System.out.println("Diameter: "+diameter);
         Collections.sort(avDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));//make a priority array for center nodes
 //        System.out.printf("[");
 //        for(Node node:avDistNodes){
@@ -272,12 +270,7 @@ public final class TaxiScheduling {
             if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
                 closest.path.clear();//Remove the current walking goal
             //System.out.println("Chosen taxi: "+closest);
-            for(int i=0; i<taxis.length; i++){
-                System.out.printf("Taxi %d (%d): %d | ",i+1,taxis[i].getLoc().getNodeDistance()[c.getLoc()],taxis[i].getClients().size());
-            }
-            System.out.printf("\n");
             closest.clients.add(c);//Add the customer to the taxi
-            System.out.println("Distance of taxi("+closest.ID+") from customer: "+closest.getLoc().getNodeDistance()[c.getLoc()]);
             closest.greedyInsertSalesman(nodes[c.getLoc()], c.getDest());//InserSalesman of the nodes.
         } else {
             orderQueue.add(c);
@@ -312,7 +305,6 @@ public final class TaxiScheduling {
             currentNode = initialPosQ.get(counter);
             counter++;
         }  
-        System.out.println(initialPosQ);
         counter = 0;
         for(Taxi taxi : taxis){
             taxi.setLoc(initialPosQ.get(counter));
@@ -376,6 +368,30 @@ public final class TaxiScheduling {
                 
             } else{
                 for(Taxi taxi: taxis){ //Loop through all taxi's to determine their next move.
+//                    if(taxi.getId() == 55){
+//                        System.out.println("-------------------------------------------------------");
+//
+//                        System.out.printf("Taxi%d (%d): ", taxi.ID,taxi.clients.size());
+//                        for(Node node : taxi.getPath()){
+//                            System.out.printf("%d, ", node.id);
+//                        }
+//                        System.out.printf("\n");
+//                        System.out.printf("Customers: ");
+//                        for(Customer cust : taxi.getClients()){
+//                            System.out.printf("%d->%d", cust.getLoc(),cust.getDest().id);
+//                            if(cust.getStatus().equals(Customer.Status.ARRIVED)){
+//                                System.out.printf(" (A) | ");
+//                            } else if(cust.getStatus().equals(Customer.Status.TRANSIT)){
+//                                System.out.printf(" (T) | ");
+//                            } else if(cust.getStatus().equals(Customer.Status.WAITING)){
+//                                System.out.printf(" (W) | ");
+//                            } else {
+//                                System.out.printf(" (?) | ");
+//                            }
+//                        }
+//                        System.out.printf("\n");
+//                    }
+                    
                     if(taxi.path.peek() == taxi.getLoc()){ //If the taxi is at its destination.
 
                         int clientSize = taxi.getClients().size();

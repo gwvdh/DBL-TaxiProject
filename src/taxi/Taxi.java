@@ -84,7 +84,7 @@ public class Taxi {
                 this.path.add(counter+1, dest);
             }
 //------------------------------------------------------------------------------            
-            if(!(loc.equals(this.getLoc()))){//Location
+            if(this.location.equals(loc)){//Location
                 int counter2 = counter;
                 //Look for shortest distance from current nodes in the path
                 for(int i=counter; i>0; i--){
@@ -110,7 +110,18 @@ public class Taxi {
                 } else {
                     this.path.add(counter2+1, loc);
                 }
+            } else{
+                this.path.add(0, loc);
             }
+
+        }
+        //Remove dupelicate (concecutive) destinations
+        for(int i=1; i<this.path.size(); i++){
+            if(this.path.get(i).equals(this.path.get(i-1))){
+                this.path.remove(i);
+                i--;
+            }
+            
         }
         //System.out.println("After path "+this.ID+": "+this.getPath());
         
