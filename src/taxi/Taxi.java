@@ -84,7 +84,7 @@ public class Taxi {
                 this.path.add(counter+1, dest);
             }
 //------------------------------------------------------------------------------            
-            if(this.location.equals(loc)){//Location
+            if(!this.location.equals(loc)){//Location
                 int counter2 = counter;
                 //Look for shortest distance from current nodes in the path
                 for(int i=counter; i>0; i--){
