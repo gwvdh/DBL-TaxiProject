@@ -164,12 +164,11 @@ public final class TaxiScheduling {
             }
         }
         pathCost += distance;
-        //System.out.println(alpha);
         if(alpha>0.5){
             return (taxi.getLoc().getNodeDistance()[cust.getLoc()]+cust.getDest().getNodeDistance()[cust.getLoc()]+taxi.path.peek().getNodeDistance()[cust.getDest().id])*Math.max(taxi.clients.size(),1);
         } else{
             double tempCost = (pathCost*Math.max(taxi.clients.size(),1))/(Math.pow((pathCost+2)*Math.max(taxi.clients.size(),1), alpha));
-            return tempCost*tempCost;//      pathCost*Math.max(taxi.clients.size(),1);
+            return tempCost*tempCost;
         }
     }
     
@@ -225,11 +224,14 @@ public final class TaxiScheduling {
                         }
                     }
                     full = false;
-                }else if(getEstCost(c,taxi) <estCost){
-                    if(getFairCost(c,taxi)){
-                        closest = taxi;
-                        estCost = getEstCost(c,taxi);
-                        full = false;
+                }else {
+                    double taxiEstCost = getEstCost(c,taxi);
+                    if(taxiEstCost <estCost){
+                        if(getFairCost(c,taxi)){
+                            closest = taxi;
+                            estCost = taxiEstCost;
+                            full = false;
+                        }
                     }
                 }
             } 
@@ -237,7 +239,7 @@ public final class TaxiScheduling {
         if((closest.getClients().size() < closest.getCap()) && !full){
             if(closest.clients.isEmpty() && !closest.path.isEmpty())//If the taxi was walking without having scheduled customers
                 closest.path.clear();//Remove the current walking goal
-            //System.out.println("Chosen taxi: "+closest);
+            
             closest.clients.add(c);//Add the customer to the taxi
             closest.greedyInsertSalesman(nodes[c.getLoc()], c.getDest());//InserSalesman of the nodes.
         } else {
@@ -344,12 +346,10 @@ public final class TaxiScheduling {
                                 i--;//Make sure we don't skip a passenger (or get out of bounds)
                             }
                         }
-                        
                         for(Customer customer : taxi.clients){
                             if(customer.getLoc() == taxi.getLoc().getId() && customer.getStatus().equals(Customer.Status.WAITING)){
                                 taxi.addPas(customer);
                             }
-                                
                         }
                         taxi.path.poll();//Remove the destination from the queue.
                         List<Node> askedNodes = new ArrayList<>();
@@ -381,7 +381,6 @@ public final class TaxiScheduling {
                         taxi.path.add(taxi.getBase());
                     }
                 }
-                
                 scanner.println("c");
             }
 
