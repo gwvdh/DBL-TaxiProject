@@ -12,9 +12,11 @@ import java.util.ArrayList;
  * @author s151341
  */
 class Node {
+    boolean grouped = false;
     int id;
     Node[] adjacent;
     int sumDistance;
+    int gravity;
     int[] nodeDistance;
     Node[] path;
     ArrayList<Taxi> taxiList = new ArrayList<>();

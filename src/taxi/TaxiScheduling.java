@@ -42,6 +42,9 @@ public final class TaxiScheduling {
 
         l = Integer.parseInt(scanner.nextLine());
         alpha = Double.parseDouble(scanner.nextLine());
+        
+        System.out.println(alpha);
+        
         m = Integer.parseInt(scanner.nextLine());
         String[] parts = scanner.nextLine().split(" ");
         x = Integer.parseInt(parts[0]);
@@ -56,7 +59,6 @@ public final class TaxiScheduling {
 
         
         n = Integer.parseInt(scanner.nextLine());
-        
         nodes = new Node[n];
 
         for(int i=0;i<n;i++) {
@@ -222,6 +224,40 @@ public final class TaxiScheduling {
             return tempCost*tempCost;//      pathCost*Math.max(taxi.clients.size(),1);
         }
     }
+    
+    boolean getFairCost(Customer c, Taxi taxi){
+        int eXpathCost = 0;
+        int distance = taxi.getLoc().getNodeDistance()[c.getLoc()];
+        for(Node node: taxi.getPath()){
+            if(node.getNodeDistance()[c.getLoc()]<distance){
+                distance = node.getNodeDistance()[c.getLoc()];
+            }
+        }
+        eXpathCost += distance;
+        eXpathCost += c.getDest().getNodeDistance()[c.getLoc()];
+        distance = taxi.getLoc().getNodeDistance()[c.getDest().id];
+        for(Node node: taxi.getPath()){
+            if(node.getNodeDistance()[c.getDest().getId()]<distance){
+                distance = node.getNodeDistance()[c.getDest().getId()];
+            }
+        }
+        eXpathCost += distance;
+        double taxiCost=0;
+        for(Customer taxiC : taxi.getClients()){
+            double value = (time-taxiC.startTime+eXpathCost);
+            taxiCost += value*value;
+        }
+        double customerCost=0;
+        customerCost+=time-c.startTime+taxi.getPath().get(taxi.getPath().size()-1).getNodeDistance()[c.getLoc()]+c.getDest().getNodeDistance()[c.getLoc()];
+        Node currNode = taxi.getLoc();
+        for(Node node : taxi.getPath()){
+            customerCost += currNode.getNodeDistance()[node.id];
+            currNode = node;
+        }
+        //System.out.println("Taxi"+taxi.ID+" ("+taxi.getClients().size()+"): "+taxi.getLoc().id);
+        //System.out.println("TaxiCost: "+taxiCost+" | CustomerCost: "+(customerCost*customerCost));
+        return Math.pow(taxiCost, alpha)<=Math.pow(customerCost*customerCost,alpha);
+    }
 
     void assignTaxi(Customer c){
         Taxi closest = taxis[0];
@@ -246,11 +282,12 @@ public final class TaxiScheduling {
                     }
                     full = false;
                 }else if(getEstCost(c,taxi) <estCost){
-                    closest = taxi;
-                    estCost = getEstCost(c,taxi);
-                    full = false;
+                    if(getFairCost(c,taxi)){
+                        closest = taxi;
+                        estCost = getEstCost(c,taxi);
+                        full = false;
+                    }
                 }
-                
             } 
         }
 //            if(taxi.getClients().size() < taxi.getCap()){
@@ -277,10 +314,162 @@ public final class TaxiScheduling {
         }
     }
     
+    void setInitialPos3(){//Inefficient
+        Node currentNode = avDistNodes.get(0);
+        int dia = diameter/2;
+        int total = 0;
+        for(Node node : avDistNodes){
+            total += node.sumDistance;
+        }
+        int avAvDistNodes=total/avDistNodes.size();
+        total = 0;
+        int n_nodes=0;
+        for(int i=0; i<n; i++){
+            if(currentNode.getNodeDistance()[i]==(dia/2)){
+                total += currentNode.sumDistance;
+                n_nodes++;
+            }
+        } 
+        double multiplier = (double) avAvDistNodes/((double)total/n_nodes);
+        int radius = 0;
+        for(int i=0; i<currentNode.getNodeDistance().length; i++){
+            if(currentNode.getNodeDistance()[i]>radius){
+                radius = currentNode.getNodeDistance()[i];
+            }
+        }
+        
+        //System.out.println(avAvDistNodes+"/("+total+"/"+n_nodes+")="+multiplier);
+        dia = (int) ((radius)*multiplier);
+        Node secondNode = null;
+        initialPosQ.add(currentNode);
+        int counter=0;
+        while(initialPosQ.size()<x){
+//            total = 0;
+//            for(Node node : avDistNodes){
+//                total += node.sumDistance;
+//            }
+//            avAvDistNodes=total/avDistNodes.size();
+//            total = 0;
+//            n_nodes=0;
+//            for(int i=0; i<n; i++){
+//                if(currentNode.getNodeDistance()[i]==(dia/2)){
+//                    total += currentNode.sumDistance;
+//                    n_nodes++;
+//                }
+//            } 
+//            multiplier = (double) avAvDistNodes/((double)total/n_nodes);
+            //System.out.println("Actual Diameter: "+radius+" | Dia: "+dia);
+            for(int i=0; i<n; i++){
+                //System.out.println(((dia/(2))*multiplier));
+                if(secondNode == null && currentNode.getNodeDistance()[i]==(int)((dia/(2))*multiplier)){
+                    System.out.println(secondNode);
+                    secondNode = nodes[i];
+                    initialPosQ.add(nodes[i]);
+                } else if(currentNode.getNodeDistance()[i]==(int)((dia/(2))*multiplier) && secondNode.getNodeDistance()[i]>(int)((dia/(4))*multiplier)){
+                    secondNode = nodes[i];
+                    initialPosQ.add(nodes[i]);
+                }
+            }
+            
+//            for(int i=0; i<n; i++){
+//                if(currentNode.getNodeDistance()[i]==(dia/2)){
+//                    initialPosQ.add(nodes[i]);
+//                }
+//            }
+            //System.out.println(dia);
+            //System.out.println(initialPosQ);
+            dia = (int) ((dia/(2))*multiplier);
+            currentNode = initialPosQ.get(counter);
+            counter++;
+        }  
+        counter = 0;
+        for(Taxi taxi : taxis){
+            taxi.setLoc(initialPosQ.get(counter));
+            taxi.setBase(initialPosQ.get(counter));
+            counter++;
+        }
+//        for(Taxi taxi : taxis){
+//            for(Node node : avDistNodes){
+//                if(!node.hasTaxi()){
+//                    taxi.setLoc(node);
+//                    break;
+//                }
+//            }
+//        }
+        scanner.println("c");
+        
+    }
+    
+    void setInitialPos2(){//Newtons universal gravity law (M_i*M_j/(D^2_ij))
+        List<Node> newDistNodes = avDistNodes;
+        Node currentNode;
+        System.out.println("Middle Node: "+avDistNodes.get(0).id);
+        while(initialPosQ.size()<x){
+            currentNode = newDistNodes.get(0);
+            initialPosQ.add(currentNode);
+            for(int i=0; i<n; i++){
+                if((newDistNodes.get(i).getNodeDistance()[currentNode.getId()]) != 0){
+                    if(currentNode.sumDistance == 0){
+                        currentNode.sumDistance = 1;
+                    }
+                    int d = (newDistNodes.get(i).getNodeDistance()[currentNode.getId()]);
+                    //System.out.println("Sumdistance: "+currentNode.sumDistance);
+                    newDistNodes.get(i).sumDistance -= d*d;//*d*d*(Math.pow(newDistNodes.get(i).sumDistance/currentNode.sumDistance,2/5));
+                }
+            }
+            
+            //System.out.printf("Gravity: ");
+            for(Node node : nodes){
+                node.gravity = 0;
+                //System.out.printf("%d-%d: %d | ",newDistNodes.get(i).id,newDistNodes.get(i-1).id,((newDistNodes.get(i).sumDistance*newDistNodes.get(i-1).sumDistance)/((newDistNodes.get(i).getNodeDistance()[newDistNodes.get(i-1).getId()])*(newDistNodes.get(i).getNodeDistance()[newDistNodes.get(i-1).getId()]))));
+                for(Node node2: nodes){
+                    if(!node.equals(node2)){
+                        node.gravity += ((node.sumDistance*node2.sumDistance)/((node.getNodeDistance()[node2.getId()])));//*(node.getNodeDistance()[node2.getId()])));
+                    }
+                }
+            }
+            //System.out.printf("\n");
+            //((o2.sumDistance*o1.sumDistance)/((o2.getNodeDistance()[o1.getId()])*(o2.getNodeDistance()[o1.getId()])))
+            
+            Collections.sort(newDistNodes, (Node o1, Node o2) -> (o1.sumDistance-o2.sumDistance));
+            
+            //Collections.sort(newDistNodes, (Node o1, Node o2) -> (o1.gravity-o2.gravity));
+            System.out.printf("[");
+            for(int i=0; i<n; i++){
+                System.out.printf("%d(%d), ",newDistNodes.get(i).id,newDistNodes.get(i).gravity);
+            }
+            System.out.printf("]\n");
+        }
+        int counter = 0;
+        for(Taxi taxi : taxis){
+            taxi.setLoc(initialPosQ.get(counter));
+            taxi.setBase(initialPosQ.get(counter));
+            counter++;
+        }
+        scanner.println("c");
+    }
+    
     void setInitialPos(){//Set taxi's at high priority nodes
         Node currentNode = avDistNodes.get(0);
+        int currentTaxi = 0;
+        if(x>=n){
+            int times = x/n;
+            for(int i=0; i<times; i++){
+                for(Node node : avDistNodes){
+                    initialPosQ.add(node);
+                }
+            }
+        } 
+        if(taxis.length-currentTaxi >= n/2){
+            for(Node node : avDistNodes){
+                if(currentNode.getNodeDistance()[node.id]%2 == 0){
+                    initialPosQ.add(node);
+                }
+            }
+        }
+        
         Node secondNode = null;
-        int dia = diameter;
+        int dia = diameter/2;
         initialPosQ.add(currentNode);
         int counter=0;
         while(initialPosQ.size()<x){
@@ -346,14 +535,15 @@ public final class TaxiScheduling {
             
 
             if(scanner.hasNextLine()){
-                getOrders(scanner.nextLine());
+                if(time<=trainT){
+                    scanner.nextLine();
+                } else {
+                    getOrders(scanner.nextLine());
+                }
             }
             //System.out.println(orderQueue);
             // first we assign taxis to the customers in the queue
-            int lengthQueue = orderQueue.size();
-            for(int i=0; i<lengthQueue; i++){
-                assignTaxi(orderQueue.poll());
-            }
+            
 //            while(!orderQueue.isEmpty()){
 //                assignTaxi(orderQueue.poll());
 //            }
@@ -367,30 +557,11 @@ public final class TaxiScheduling {
                 }
                 
             } else{
+                int lengthQueue = orderQueue.size();
+                for(int i=0; i<lengthQueue; i++){
+                    assignTaxi(orderQueue.poll());
+                }
                 for(Taxi taxi: taxis){ //Loop through all taxi's to determine their next move.
-//                    if(taxi.getId() == 55){
-//                        System.out.println("-------------------------------------------------------");
-//
-//                        System.out.printf("Taxi%d (%d): ", taxi.ID,taxi.clients.size());
-//                        for(Node node : taxi.getPath()){
-//                            System.out.printf("%d, ", node.id);
-//                        }
-//                        System.out.printf("\n");
-//                        System.out.printf("Customers: ");
-//                        for(Customer cust : taxi.getClients()){
-//                            System.out.printf("%d->%d", cust.getLoc(),cust.getDest().id);
-//                            if(cust.getStatus().equals(Customer.Status.ARRIVED)){
-//                                System.out.printf(" (A) | ");
-//                            } else if(cust.getStatus().equals(Customer.Status.TRANSIT)){
-//                                System.out.printf(" (T) | ");
-//                            } else if(cust.getStatus().equals(Customer.Status.WAITING)){
-//                                System.out.printf(" (W) | ");
-//                            } else {
-//                                System.out.printf(" (?) | ");
-//                            }
-//                        }
-//                        System.out.printf("\n");
-//                    }
                     
                     if(taxi.path.peek() == taxi.getLoc()){ //If the taxi is at its destination.
 
