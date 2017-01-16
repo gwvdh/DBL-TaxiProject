@@ -32,7 +32,7 @@ public class TaxiScanner {
      */
     private TaxiScanner(){
         state = State.INITIAL;
-        File input = new File("C:\\Users\\s151341\\Documents\\TUe\\2IO90 - DBL Algorithms\\Test Data\\publictest\\BetterNames\\06.in");//Put the path to the file here
+        File input = new File("C:\\Users\\s151341\\Documents\\TUe\\2IO90 - DBL Algorithms\\Test Data\\publictest\\BetterNames\\22.in");//Put the path to the file here
         //File input = new File("C:\\Users\\s151341\\Documents\\NetBeansProjects\\DBL-TaxiProject\\src\\taxi\\input.txt");//Put the path to the file here
         try {
             scanner = new Scanner(input);

@@ -7,10 +7,6 @@ package taxi;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author s151341
- */
 class Node {
     boolean grouped = false;
     int id;
@@ -25,9 +21,6 @@ class Node {
     Node(int id, int n){
         this.id = id;
         this.path = new Node[n];
-//        for(int i = 0; i < nodeDistance.length; i++){
-//            nodeDistance[i] = -1;
-//        }
     }
     
     public void addCustomer(Customer customer){

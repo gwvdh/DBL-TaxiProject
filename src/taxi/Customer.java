@@ -30,13 +30,6 @@ public class Customer {
         status = Status.WAITING;
     }
     
-    double cost(int a, int c, int shortest){
-        double aa = (double)(a);
-        double cc = (double)(c);
-        double ss = (double)(shortest);
-        return Math.pow((aa-cc)/Math.pow(ss+2,alpha), 2.0);
-    }
-    
     Status getStatus(){
         return status;
     }
@@ -54,10 +47,6 @@ public class Customer {
     }
     void setStatus(Status s){
         status = s;
-    }
-    double arrived(int time){
-        status = Status.ARRIVED;
-        return cost(time, startTime, shortest);
     }
     public void setDest(Node d){
         this.destination = d;

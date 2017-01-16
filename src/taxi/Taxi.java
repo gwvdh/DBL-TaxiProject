@@ -27,34 +27,8 @@ public class Taxi {
         capacity = cap;
         n = nodes;
     }
-    
-    void greedySalesman(){//Order the path such that from each node to the next, it is the shortest distance
-        Node[] nodes = new Node[path.size()];
-        for(int i=0; i<path.size(); i++){//Get all nodes from the path
-            nodes[i] = path.poll();
-        }
-        Node current = location;
-        for(int i=0; i<nodes.length; i++){//Reorder nodes
-            int smallest = 0;
-            for(int j=1; j<nodes.length; j++){
-                if(nodes[smallest] == null){
-                    smallest = j;
-                } else if(nodes[j] != null ){
-                    if(nodes[smallest].nodeDistance[current.id] > nodes[j].nodeDistance[current.id]){
-                        smallest = j;
-                    }
-                }
-            }
-            if(nodes[smallest] != null){
-                path.add(nodes[smallest]);//Add the node to the queue
-            }
-            current = nodes[smallest];
-            nodes[smallest] = null;//Make sure we won't find the same node twice
-        }
-    }
 
     void greedyInsertSalesman(Node loc, Node dest){
-        //System.out.println("Before path "+this.ID+": "+this.getPath());
         int counter = this.path.size()-1;
         if(counter == -1){//If nothing is in the path, just add the location and destination
             this.path.add(loc);
@@ -121,10 +95,7 @@ public class Taxi {
                 this.path.remove(i);
                 i--;
             }
-            
         }
-        //System.out.println("After path "+this.ID+": "+this.getPath());
-        
     }
 
     int getId(){
@@ -206,16 +177,5 @@ public class Taxi {
         scanner.println("d "+ this.ID+" "+ this.clients.get(i).getDest().id+" ");
         clients.get(i).setStatus(Customer.Status.ARRIVED);
         clients.remove(clients.get(i));
-        
-        //System.out.println(this.ID+" clients: "+clients+" | Path: "+path);
-        
-      
-//        for(int i=0; i<clients.size(); i++){
-//            if(clients.get(i).getDest() == this.location.id){
-//                scanner.println("d "+ this.ID+" "+ this.location.id+" ");
-//                clients.get(i).setStatus(Customer.Status.ARRIVED);
-//                clients.remove(i);
-//            }
-//        }
     }
 }
