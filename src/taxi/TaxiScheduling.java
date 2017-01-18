@@ -40,9 +40,7 @@ public final class TaxiScheduling {
 
         l = Integer.parseInt(scanner.nextLine());
         alpha = Double.parseDouble(scanner.nextLine());
-        
-        System.out.println(alpha);
-        
+
         m = Integer.parseInt(scanner.nextLine());
         String[] parts = scanner.nextLine().split(" ");
         x = Integer.parseInt(parts[0]);
