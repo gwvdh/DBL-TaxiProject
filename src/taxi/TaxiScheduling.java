@@ -21,6 +21,7 @@ public final class TaxiScheduling {
 
     // bookkeeping variables
     int time;
+    double cost;
     int diameter;
     LinkedList<Node> initialPosQ = new LinkedList<>();
 
@@ -339,7 +340,7 @@ public final class TaxiScheduling {
                         int clientSize = taxi.getClients().size();
                         for(int i=0; i < clientSize; i++){ //Look if any passenger wants to disembark
                             if(taxi.clients.get(i).getDest().getId() == taxi.location.getId() && taxi.clients.get(i).getStatus().equals(Customer.Status.TRANSIT)){
-                                taxi.dropPas(i);//Drop the passenger
+                                cost += taxi.dropPas(i, time, alpha);//Drop the passenger
                                 clientSize = taxi.getClients().size();
                                 i--;//Make sure we don't skip a passenger (or get out of bounds)
                             }
@@ -384,7 +385,7 @@ public final class TaxiScheduling {
 
             time++;
             System.out.println(time);
-
+            System.out.println(cost);
             boolean empty = true;
             for (Taxi taxi : taxis) {
                 empty &= taxi.isEmpty();
