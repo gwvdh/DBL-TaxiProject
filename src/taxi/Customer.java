@@ -12,6 +12,7 @@ public class Customer {
         WAITING, TRANSIT, ARRIVED
     }
     
+    int minDist;
     int ID;
     int location;
     Node destination;
@@ -25,9 +26,10 @@ public class Customer {
     Customer(int location, Node destination, int startTime, double alpha){
         this.location = location;
         this.destination = destination;
-        this.startTime = startTime;
+        this.startTime = startTime-1;
         this.alpha = alpha;
         status = Status.WAITING;
+        minDist = this.destination.getNodeDistance()[location];
     }
     
     Status getStatus(){

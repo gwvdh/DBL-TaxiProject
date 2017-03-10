@@ -173,9 +173,12 @@ public class Taxi {
         return false;
     }
 
-    void dropPas(int i){
+    double dropPas(int i, int time, double alpha){
+        double cost;
         scanner.println("d "+ this.ID+" "+ this.clients.get(i).getDest().id+" ");
         clients.get(i).setStatus(Customer.Status.ARRIVED);
+        cost = Math.pow(( (time-clients.get(i).startTime)/(Math.pow( (clients.get(i).minDist+2) , alpha)) ), 2);
         clients.remove(clients.get(i));
+        return cost;
     }
 }
